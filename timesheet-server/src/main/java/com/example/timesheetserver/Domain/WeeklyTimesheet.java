@@ -5,7 +5,7 @@ import lombok.Builder;
 import java.util.List;
 
 public class WeeklyTimesheet {
-    private String weekending;
+    private String weekEnding;
 
     private String submissionStatus;
 
