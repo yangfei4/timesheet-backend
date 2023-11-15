@@ -1,9 +1,16 @@
 package com.example.timesheetserver.Domain;
 
-import lombok.Builder;
+import lombok.*;
 
 import java.util.List;
 
+@org.springframework.data.mongodb.core.mapping.Document
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+@ToString
 public class WeeklyTimesheet {
     private String weekEnding;
 
