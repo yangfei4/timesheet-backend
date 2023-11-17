@@ -18,13 +18,12 @@ public class ProfileService {
         this.profileRepository = profileRepository;
     }
 
-    public List<DailyTimesheet> updateWeeklyTimesheetTemplate(String id, List<DailyTimesheet> template) {
+    public void updateWeeklyTimesheetTemplate(String id, List<DailyTimesheet> template) {
         Optional<Profile> optional = profileRepository.findById(id);
         optional.ifPresent(profile -> {
             profile.setWeeklyTimesheetTemplate(template);
             profileRepository.save(profile);
         });
-        return template;
     }
 
     public List<Profile> getAllProfiles() {
