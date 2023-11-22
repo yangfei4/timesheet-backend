@@ -1,15 +1,19 @@
 package com.example.profileserver.Controller;
 
 
+import com.example.profileserver.Service.AmazonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.example.profileserver.Domain.Profile;
 import com.example.profileserver.Domain.Contact;
 import com.example.profileserver.Service.ProfileService;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.print.attribute.standard.Media;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,10 +22,12 @@ import java.util.Optional;
 public class ProfileController {
 
     ProfileService profileService;
+    AmazonClient amazonClient;
 
     @Autowired
-    ProfileController(ProfileService profileService) {
+    ProfileController(ProfileService profileService, AmazonClient amazonClient) {
         this.profileService = profileService;
+        this.amazonClient = amazonClient;
     }
 
     @CrossOrigin
@@ -65,13 +71,13 @@ public class ProfileController {
     }
 
     @CrossOrigin
-    @PostMapping("")
+    @PostMapping(value = "", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiResponse<?>> createProfile(@RequestBody Profile profile) {
         try {
             Profile data = profileService.createProfile(profile);
             String message = "Profile created successfully";
             ApiResponse<Profile> apiResponse = new ApiResponse<Profile>(message, data);
-            return ResponseEntity.ok(apiResponse);
+            return ResponseEntity.status(HttpStatus.CREATED).body(apiResponse);
         } catch (Exception e) {
             e.printStackTrace();
             String message = "Failed to create new profile";
@@ -81,7 +87,7 @@ public class ProfileController {
     }
 
     @CrossOrigin
-    @PatchMapping("/{id}")
+    @PatchMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiResponse<?>> updateContact(@PathVariable String id, @RequestBody Contact contact) {
         try {
             Contact data = profileService.updateContact(id, contact);
@@ -96,6 +102,21 @@ public class ProfileController {
         }
     }
 
+    @CrossOrigin
+    @PostMapping(value = "/uploadAvatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    private ResponseEntity<ApiResponse<?>> updateAvatar(@RequestParam("userId") String id, @RequestParam("file") MultipartFile file) {
+        try {
+            String data = amazonClient.uploadAvatar(id, file);
+            String message = String.format("Upload avatar for user %s successfully", id);
+            ApiResponse<String> apiResponse = new ApiResponse<>(message, data);
+            return ResponseEntity.status(HttpStatus.CREATED).body(apiResponse);
+        } catch (Exception e) {
+            e.printStackTrace();
+            String message = "Failed to upload avatar for user" + id;
+            ApiResponse<String> apiResponse = constructErrorResponse(message);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(apiResponse);
+        }
+    }
 
     private ApiResponse<String> constructErrorResponse(String message) {
         String data = "N/A";
