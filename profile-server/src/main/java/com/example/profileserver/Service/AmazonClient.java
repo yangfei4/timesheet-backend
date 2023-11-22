@@ -29,7 +29,6 @@ import java.util.Objects;
 import java.util.Optional;
 
 @Service
-@Configuration
 public class AmazonClient {
     // Interface S3Clent: https://sdk.amazonaws.com/java/api/latest/software/amazon/awssdk/services/s3/S3Client.html#putBucketAccelerateConfiguration(software.amazon.awssdk.services.s3.model.PutBucketAccelerateConfigurationRequest)
     private AmazonS3 s3Client;
