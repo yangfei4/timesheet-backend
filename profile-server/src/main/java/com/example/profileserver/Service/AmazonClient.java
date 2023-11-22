@@ -62,7 +62,7 @@ public class AmazonClient {
                 .build();
     }
 
-    private File convertMultiParttoFile(MultipartFile multipartFile) throws IOException {
+    private File convertMultiPartToFile(MultipartFile multipartFile) throws IOException {
         File file = new File(Objects.requireNonNull(multipartFile.getOriginalFilename()));
         try(FileOutputStream fos = new FileOutputStream(file)) {
             fos.write(multipartFile.getBytes());
@@ -79,16 +79,17 @@ public class AmazonClient {
         s3Client.putObject(putObjectRequest);
     }
 
-    public String uploadAvatar(String profileId, MultipartFile multiFile) {
+    public String uploadAvatar(String profileId, MultipartFile multipartFile) {
         String fileUrl = "";
         try {
-            File file = convertMultiParttoFile(multiFile);
-            String fileName = generateFileName(multiFile);
+            File file = convertMultiPartToFile(multipartFile);
+            String fileName = generateFileName(multipartFile);
             fileUrl = endpointUrl + "/" + bucketName + "/" + fileName;
             Optional<Profile> profile = profileService.getProfileById(profileId);
             String finalFileUrl = fileUrl;
             profile.ifPresent(profile1 -> profile1.setProfileAvatar(finalFileUrl)); //only save avatar url to db
             uploadFileToS3Bucket(fileName, file);
+            file.delete();
         } catch (Exception e) {
             e.printStackTrace();
         }
