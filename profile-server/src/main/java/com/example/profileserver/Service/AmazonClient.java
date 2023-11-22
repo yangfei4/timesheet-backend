@@ -87,7 +87,8 @@ public class AmazonClient {
             String fileName = generateFileName(multiFile);
             fileUrl = endpointUrl + "/" + bucketName + "/" + fileName;
             Optional<Profile> profile = profileService.getProfileById(profileId);
-            profile.ifPresent(profile1 -> profile1.setProfileAvatar(fileUrl)); //only save avatar url to db
+            String finalFileUrl = fileUrl;
+            profile.ifPresent(profile1 -> profile1.setProfileAvatar(finalFileUrl)); //only save avatar url to db
             uploadFileToS3Bucket(fileName, file);
         } catch (Exception e) {
             e.printStackTrace();
