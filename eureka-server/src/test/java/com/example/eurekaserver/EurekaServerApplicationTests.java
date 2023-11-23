@@ -1,10 +1,10 @@
-package com.example.timesheetbackend;
+package com.example.eurekaserver;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class TimesheetBackendApplicationTests {
+class EurekaServerApplicationTests {
 
     @Test
     void contextLoads() {
