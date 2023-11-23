@@ -1,19 +1,26 @@
 package com.example.timesheetserver.Controller;
 
+import com.amazonaws.services.opsworks.model.StartInstanceRequest;
 import com.example.timesheetserver.Domain.DailyTimesheet;
 import com.example.timesheetserver.Domain.Timesheet;
 import com.example.timesheetserver.Domain.WeeklyTimesheet;
+import com.example.timesheetserver.Service.AmazonClient;
 import com.example.timesheetserver.Service.ProfileService;
 import com.example.timesheetserver.Service.TimesheetService;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.bouncycastle.jcajce.provider.asymmetric.ec.KeyFactorySpi;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.aggregation.DateOperators;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.management.monitor.GaugeMonitor;
+import javax.swing.text.html.Option;
 import java.sql.Time;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/timesheet")
@@ -21,18 +28,77 @@ public class TimesheetController {
 
     ProfileService profileService;
     TimesheetService timesheetService;
+    AmazonClient amazonClient;
 
     @Autowired
-    TimesheetController(ProfileService profileService, TimesheetService timesheetService) {
+    TimesheetController(ProfileService profileService, TimesheetService timesheetService, AmazonClient amazonClient) {
         this.profileService = profileService;
         this.timesheetService = timesheetService;
+        this.amazonClient = amazonClient;
     }
 
     @CrossOrigin
-    @PatchMapping("/template/{profile_id}")
-    public ResponseEntity<ApiResponse<?>> updatePersonalTemplate(@PathVariable String profile_id, @RequestBody List<DailyTimesheet> template) {
+    @GetMapping("/summary")
+    public ResponseEntity<ApiResponse<?>> getAllTimesheets() {
         try {
-            profileService.updateWeeklyTimesheetTemplate(profile_id, template);
+            List<Timesheet> data = timesheetService.getAllTimesheets();
+            String message = "Fetch all timesheets successfully";
+            ApiResponse<List<Timesheet>> apiResponse = new ApiResponse<>(message, data);
+            return ResponseEntity.ok(apiResponse);
+        } catch (Exception e) {
+            e.printStackTrace();
+            String message = "Failed to fetch all Timesheets";
+            ApiResponse<String> apiResponse = constructErrorResponse(message);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(apiResponse);
+        }
+    }
+
+    @CrossOrigin
+    @GetMapping("/summary/{profileId}")
+    public ResponseEntity<ApiResponse<?>> getAllTimesheetsByProfileId(@PathVariable String profileId) {
+        try {
+            List<Timesheet> data = timesheetService.getAllTimesheetsByProfileId(profileId);
+            String message = String.format("Fetch all timesheets for %s successfully", profileId);
+            ApiResponse<List<Timesheet>> apiResponse = new ApiResponse<>(message, data);
+            return ResponseEntity.ok(apiResponse);
+        } catch (Exception e) {
+            e.printStackTrace();
+            String message = "Failed to fetch all Timesheets by profile Id";
+            ApiResponse<String> apiResponse = constructErrorResponse(message);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(apiResponse);
+        }
+    }
+
+    @CrossOrigin
+    @GetMapping("/weeklytimesheet")
+    public ResponseEntity<ApiResponse<?>> getWeeklyTimesheet(@RequestParam String profileId, @RequestParam String weekEnding) {
+        try {
+            Optional<Timesheet> timesheet = timesheetService.getTimesheetByProfileIdAndWeekEnding(profileId, weekEnding);
+            if(timesheet.isPresent()){
+                String message = "Fetch timesheet by profile Id and week ending successfully";
+                Timesheet data = timesheet.get();
+                ApiResponse<Timesheet> apiResponse = new ApiResponse<>(message, data);
+                return ResponseEntity.ok(apiResponse);
+            }
+            else {
+                String message = "Timesheet not found";
+                String data = "N/A";
+                ApiResponse<String> apiResponse = new ApiResponse<>(message, data);
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(apiResponse);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            String message = "Failed to get weeklyTimesheet by profile Id and week ending";
+            ApiResponse<String> apiResponse = constructErrorResponse(message);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(apiResponse);
+        }
+    }
+
+    @CrossOrigin
+    @PatchMapping("/template/{profileId}")
+    public ResponseEntity<ApiResponse<?>> updatePersonalTemplate(@PathVariable String profileId, @RequestBody List<DailyTimesheet> template) {
+        try {
+            profileService.updateWeeklyTimesheetTemplate(profileId, template);
             String message = "updated weeklyTimesheet template successfully";
             ApiResponse<List<DailyTimesheet>> apiResponse = new ApiResponse<>(message, template);
             return ResponseEntity.ok(apiResponse);
@@ -44,6 +110,24 @@ public class TimesheetController {
         }
     }
 
+    @CrossOrigin
+    @PatchMapping("/{profileId}")
+    public ResponseEntity<ApiResponse<?>> updateTimesheet(@PathVariable String profileId, @RequestBody WeeklyTimesheet weeklyTimesheet) {
+        try {
+            timesheetService.updateTimesheet(profileId, weeklyTimesheet);
+            String message = "updated timesheet successfully";
+            ApiResponse<WeeklyTimesheet> apiResponse = new ApiResponse<>(message, weeklyTimesheet);
+            return ResponseEntity.ok(apiResponse);
+        } catch (Exception e) {
+            e.printStackTrace();
+            String message = "Failed to update timesheet";
+            ApiResponse<String> apiResponse = constructErrorResponse(message);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(apiResponse);
+        }
+    }
+
+
+    /*
     @CrossOrigin
     @PatchMapping("/{timesheet_id}")
     public ResponseEntity<ApiResponse<?>> updateWeeklyTimesheet(@PathVariable String timesheet_id, @RequestBody WeeklyTimesheet weeklyTimesheet) {
@@ -59,8 +143,10 @@ public class TimesheetController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(apiResponse);
         }
     }
+    */
 
     // To be deleted, not used in the final app
+    /*
     @CrossOrigin
     @PostMapping("")
     public ResponseEntity<ApiResponse<?>> createTimesheet(@RequestBody Timesheet timesheet) {
@@ -76,6 +162,7 @@ public class TimesheetController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(apiResponse);
         }
     }
+    */
 
     private ApiResponse<String> constructErrorResponse(String message) {
         String data = "N/A";
