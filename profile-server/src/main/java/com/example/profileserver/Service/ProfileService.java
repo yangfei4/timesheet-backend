@@ -2,11 +2,13 @@ package com.example.profileserver.Service;
 
 import com.example.profileserver.DAO.ProfileRepository;
 import com.example.profileserver.Domain.Contact;
+import com.example.profileserver.Domain.DailyTimesheet;
 import com.example.profileserver.Domain.Profile;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,6 +22,29 @@ public class ProfileService {
     }
 
     public Profile createProfile(Profile profile) {
+        // add default values for some attributes
+        profile.setRemainingFloatingDay(3);
+        profile.setRemainingVacationDay(0);
+        profile.setProfileAvatar("");
+        String[] weekday = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
+        List<DailyTimesheet> weeklyTimesheetTemplate = new ArrayList<>();
+        for(String day: weekday) {
+            DailyTimesheet dailyTimesheet = new DailyTimesheet();
+            dailyTimesheet.setDay(day);
+            dailyTimesheet.setHoliday(false);
+            dailyTimesheet.setFloatingDay(false);
+            dailyTimesheet.setVacationDay(false);
+            if(day.equals("Sunday") || day.equals("Saturday")) {
+                dailyTimesheet.setStartingTime("N/A");
+                dailyTimesheet.setEndingTime("N/A");
+            }
+            else {
+                dailyTimesheet.setStartingTime("09:00");
+                dailyTimesheet.setEndingTime("18:00");
+            }
+            weeklyTimesheetTemplate.add(dailyTimesheet);
+        }
+        profile.setWeeklyTimesheetTemplate(weeklyTimesheetTemplate);
         profileRepository.save(profile);
         return profile;
     }

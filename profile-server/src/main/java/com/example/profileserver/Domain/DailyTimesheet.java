@@ -1,5 +1,15 @@
 package com.example.profileserver.Domain;
 
+import lombok.*;
+import org.springframework.data.mongodb.core.mapping.Document;
+
+@Document
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+@ToString
 public class DailyTimesheet {
     private String day;
 
