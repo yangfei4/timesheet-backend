@@ -15,6 +15,7 @@ import org.springframework.data.mongodb.core.aggregation.DateOperators;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.management.monitor.GaugeMonitor;
 import javax.swing.text.html.Option;
@@ -71,7 +72,7 @@ public class TimesheetController {
 
     @CrossOrigin
     @GetMapping("/weeklytimesheet")
-    public ResponseEntity<ApiResponse<?>> getWeeklyTimesheet(@RequestParam String profileId, @RequestParam String weekEnding) {
+    public ResponseEntity<ApiResponse<?>> getWeeklyTimesheet(@RequestParam("profileId") String profileId, @RequestParam("weekEnding") String weekEnding) {
         try {
             Optional<Timesheet> timesheet = timesheetService.getTimesheetByProfileIdAndWeekEnding(profileId, weekEnding);
             if(timesheet.isPresent()){
@@ -126,6 +127,21 @@ public class TimesheetController {
         }
     }
 
+    @CrossOrigin
+    @PatchMapping("/uploadDocument")
+    public ResponseEntity<ApiResponse<?>> uploadTimesheetDocument(@RequestParam("profileId") String profileId, @RequestParam("weekEnding") String weekEnding, @RequestParam("document") MultipartFile document) {
+        try {
+            String data = amazonClient.uploadDocument(profileId, weekEnding, document);
+            String message = "Upload document to cloud and get url successfully";
+            ApiResponse<String> apiREsponse = new ApiResponse<>(message, data);
+            return ResponseEntity.ok(apiREsponse);
+        } catch (Exception e) {
+            e.printStackTrace();
+            String message = "Failed to upload timesheet document";
+            ApiResponse<String> apiResponse = constructErrorResponse(message);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(apiResponse);
+        }
+    }
 
     /*
     @CrossOrigin
