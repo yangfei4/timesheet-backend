@@ -14,17 +14,19 @@ import java.util.List;
 public class WeeklyTimesheet {
     private String weekEnding;
 
-    private String submissionStatus;
+    private String submissionStatus; // "Not Started", "Incomplete", "Complete"
 
-    private String approvalStatus;
+    private String approvalStatus; // “N/A” – not available, “Not Approved”, “Approved”
 
-    private float totalBillingHours;
+    private float totalBillingHours; // default: 45
 
-    private float totalCompensatedHours;
+    private float totalCompensatedHours; // default: 45
 
-    private int floatingDayUsed;
+    private int floatingDayUsed; // maximum of 3
 
     private int holidayUsed;
+
+    private int vacationDayUsed; // maximum of 3
 
     private Document document;
 
