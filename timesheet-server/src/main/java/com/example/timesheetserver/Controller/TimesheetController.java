@@ -1,25 +1,17 @@
 package com.example.timesheetserver.Controller;
 
-import com.amazonaws.services.opsworks.model.StartInstanceRequest;
 import com.example.timesheetserver.Domain.DailyTimesheet;
 import com.example.timesheetserver.Domain.Timesheet;
 import com.example.timesheetserver.Domain.WeeklyTimesheet;
 import com.example.timesheetserver.Service.AmazonClient;
 import com.example.timesheetserver.Service.ProfileService;
 import com.example.timesheetserver.Service.TimesheetService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import org.bouncycastle.jcajce.provider.asymmetric.ec.KeyFactorySpi;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.aggregation.DateOperators;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.management.monitor.GaugeMonitor;
-import javax.swing.text.html.Option;
-import java.sql.Time;
 import java.util.List;
 import java.util.Optional;
 
@@ -133,11 +125,28 @@ public class TimesheetController {
         try {
             String data = amazonClient.uploadDocument(profileId, weekEnding, document);
             String message = "Upload document to cloud and get url successfully";
-            ApiResponse<String> apiREsponse = new ApiResponse<>(message, data);
-            return ResponseEntity.ok(apiREsponse);
+            ApiResponse<String> apiResponse = new ApiResponse<>(message, data);
+            return ResponseEntity.ok(apiResponse);
         } catch (Exception e) {
             e.printStackTrace();
             String message = "Failed to upload timesheet document";
+            ApiResponse<String> apiResponse = constructErrorResponse(message);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(apiResponse);
+        }
+    }
+
+    @CrossOrigin
+    @PatchMapping("/approveTimesheet")
+    public ResponseEntity<ApiResponse<?>> approveTimesheet(@RequestParam("profileId") String profileId, @RequestParam("weekEnding") String weekEnding) {
+        try {
+            timesheetService.approveTimesheet(profileId, weekEnding);
+            String data = "N/A";
+            String message = "Approved the timesheet successfully";
+            ApiResponse<String> apiResponse = new ApiResponse<>(message, data);
+            return ResponseEntity.ok(apiResponse);
+        } catch (Exception e) {
+            e.printStackTrace();
+            String message = "Failed to approve the timesheet";
             ApiResponse<String> apiResponse = constructErrorResponse(message);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(apiResponse);
         }
@@ -182,6 +191,6 @@ public class TimesheetController {
 
     private ApiResponse<String> constructErrorResponse(String message) {
         String data = "N/A";
-        return new ApiResponse<String>(message, data);
+        return new ApiResponse<>(message, data);
     }
 }

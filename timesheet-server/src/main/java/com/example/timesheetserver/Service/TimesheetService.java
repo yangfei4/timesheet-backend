@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import com.example.timesheetserver.DAO.TimesheetRepository;
 import com.example.timesheetserver.DAO.ProfileRepository;
 
+import java.sql.Time;
 import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Optional;
@@ -87,6 +88,7 @@ public class TimesheetService {
             else {
                 timesheet.getWeeklyTimesheet().setSubmissionStatus("Incomplete");
             }
+            timesheet.getWeeklyTimesheet().setApprovalStatus("Not Approved");
 
             // approvalStatus should be updated through a http request
             // update document
@@ -94,8 +96,16 @@ public class TimesheetService {
 
             // update: dailyTimesheets
             timesheet.getWeeklyTimesheet().setDailyTimesheets(updatedWeeklyTimesheet.getDailyTimesheets());
-
+            timesheetRepository.save(timesheet);
         }
+    }
+
+    public void approveTimesheet(String profileId, String weekEnding) {
+        Optional<Timesheet> optional = timesheetRepository.findByProfile_IdAndWeeklyTimesheet_WeekEnding(profileId, weekEnding);
+        optional.ifPresent(timesheet -> {
+            timesheet.getWeeklyTimesheet().setApprovalStatus("Approved");
+            timesheetRepository.save(timesheet);
+        });
     }
 
     // Will be called at midnight (0 hours, 0 minutes, 0 seconds) every Sunday
