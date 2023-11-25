@@ -3,20 +3,14 @@ package com.example.timesheetserver.Service;
 import com.example.timesheetserver.Domain.*;
 import com.example.timesheetserver.Util.TimeManager;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.aggregation.DateOperators;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import com.example.timesheetserver.DAO.TimesheetRepository;
 import com.example.timesheetserver.DAO.ProfileRepository;
 
-import javax.swing.text.html.Option;
-import java.nio.file.WatchKey;
-import java.sql.Time;
-import java.text.ParseException;
 import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Optional;
-import java.util.PrimitiveIterator;
 
 @Service
 public class TimesheetService {
@@ -49,9 +43,59 @@ public class TimesheetService {
 
     // Update weeklyTimesheet, and update its parent Timesheet accordingly.
     // retrieve weekEnding from requestBody weeklyTimesheet.
-    // TODO(Yangfei): implement this method
-    public void updateTimesheet(String profileId, WeeklyTimesheet weeklyTimesheet) {
-        String weekEnding = weeklyTimesheet.getWeekEnding();
+    public void updateTimesheet(String profileId, WeeklyTimesheet updatedWeeklyTimesheet) {
+        String weekEnding = updatedWeeklyTimesheet.getWeekEnding();
+        Optional<Timesheet> timesheet_opt = timesheetRepository.findByProfile_IdAndWeeklyTimesheet_WeekEnding(profileId, weekEnding);
+        Optional<Profile> profile_opt = profileRepository.findById(profileId);
+        if(timesheet_opt.isPresent() && profile_opt.isPresent()) {
+            Profile profile = profile_opt.get();
+            Timesheet timesheet = timesheet_opt.get();
+
+            WeeklyTimesheet oldWeeklyTimesheet = timesheet.getWeeklyTimesheet();
+
+            int remainingFloatingDay = profile.getRemainingFloatingDay();
+            int remainingVacationDay = profile.getRemainingVacationDay();
+
+            int updatedFloatingDayUsed = updatedWeeklyTimesheet.getFloatingDayUsed();
+            int updatedVacationDayUsed = updatedWeeklyTimesheet.getVacationDayUsed();
+
+            int oldFloatingDayUsed = oldWeeklyTimesheet.getFloatingDayUsed();
+            int oldVacationDayUsed = oldWeeklyTimesheet.getVacationDayUsed();
+
+            int diffFloatingDayUsed = updatedFloatingDayUsed - oldFloatingDayUsed;
+            int diffVacationDayUsed = updatedVacationDayUsed - oldVacationDayUsed;
+
+            remainingFloatingDay -= diffFloatingDayUsed;
+            remainingVacationDay -= diffVacationDayUsed;
+
+            // update remaining floating day and vacation day
+            profile.setRemainingFloatingDay(remainingFloatingDay);
+            profile.setRemainingVacationDay(remainingVacationDay);
+            profileRepository.save(profile);
+
+            // update values of hours/days
+            timesheet.getWeeklyTimesheet().setTotalCompensatedHours(updatedWeeklyTimesheet.getTotalCompensatedHours());
+            timesheet.getWeeklyTimesheet().setTotalBillingHours(updatedWeeklyTimesheet.getTotalBillingHours());
+            timesheet.getWeeklyTimesheet().setFloatingDayUsed(updatedFloatingDayUsed);
+            timesheet.getWeeklyTimesheet().setVacationDayUsed(updatedVacationDayUsed);
+            timesheet.getWeeklyTimesheet().setHolidayUsed(updatedWeeklyTimesheet.getHolidayUsed());
+
+            // update submission status: "Not Started", "Incomplete", "Complete"
+            if(updatedWeeklyTimesheet.getDocument().getUrl() != null && updatedWeeklyTimesheet.getDocument().getType().equals("approved timesheet")) {
+                timesheet.getWeeklyTimesheet().setSubmissionStatus("Complete");
+            }
+            else {
+                timesheet.getWeeklyTimesheet().setSubmissionStatus("Incomplete");
+            }
+
+            // approvalStatus should be updated through a http request
+            // update document
+            timesheet.getWeeklyTimesheet().setDocument(updatedWeeklyTimesheet.getDocument());
+
+            // update: dailyTimesheets
+            timesheet.getWeeklyTimesheet().setDailyTimesheets(updatedWeeklyTimesheet.getDailyTimesheets());
+
+        }
     }
 
     // Will be called at midnight (0 hours, 0 minutes, 0 seconds) every Sunday
@@ -70,9 +114,18 @@ public class TimesheetService {
             weeklyTimesheet.setTotalBillingHours(45);
             weeklyTimesheet.setTotalCompensatedHours(45);
             weeklyTimesheet.setFloatingDayUsed(0);
-            weeklyTimesheet.setHolidayUsed(0);
             weeklyTimesheet.setVacationDayUsed(0);
-            weeklyTimesheet.setDailyTimesheets(TimeManager.setAllDatesByWeekEnding(template, weekEnding));
+            List<DailyTimesheet> dailyTimesheets = TimeManager.setAllDatesByWeekEnding(template, weekEnding);
+            weeklyTimesheet.setDailyTimesheets(dailyTimesheets);
+
+            int holidayUsed = 0;
+            for(DailyTimesheet dailyTimesheet: dailyTimesheets) {
+                if(dailyTimesheet.isHoliday()) {
+                    holidayUsed++;
+                }
+            }
+            weeklyTimesheet.setHolidayUsed(holidayUsed);
+
             Document document = new Document();
             document.setType("");
             document.setUrl("");
@@ -82,25 +135,6 @@ public class TimesheetService {
             weeklyTimesheet.setDocument(document);
             timesheet.setWeeklyTimesheet(weeklyTimesheet);
 
-        };
+        }
     }
-
-    /*
-    // when updating weeklyTimesheet, we need to update its parent Timesheet accordingly. So this
-    // method is not applicable in our use case.
-    public void updateWeeklyTimesheet(String timesheet_id, WeeklyTimesheet weeklyTimesheet) {
-        Optional<Timesheet> optional = timesheetRepository.findById(timesheet_id);
-        optional.ifPresent(timesheet -> {
-            timesheet.setWeeklyTimesheet(weeklyTimesheet);
-            timesheetRepository.save(timesheet);
-        });
-    }
-    */
-
-    /*
-    public Timesheet createTimesheet(Timesheet timesheet) {
-        timesheetRepository.save(timesheet);
-        return timesheet;
-    }
-    */
 }

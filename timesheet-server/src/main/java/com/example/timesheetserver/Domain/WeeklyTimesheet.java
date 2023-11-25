@@ -22,7 +22,7 @@ public class WeeklyTimesheet {
 
     private float totalCompensatedHours; // default: 45
 
-    private int floatingDayUsed; // maximum of 3
+    private int floatingDayUsed; // maximum of 3 -> will be modified in front-end, same method apply to holiday and vacation
 
     private int holidayUsed;
 
