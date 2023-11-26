@@ -145,6 +145,7 @@ public class TimesheetService {
             weeklyTimesheet.setDocument(document);
             timesheet.setWeeklyTimesheet(weeklyTimesheet);
 
+            timesheetRepository.save(timesheet);
         }
     }
 }

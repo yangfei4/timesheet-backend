@@ -26,7 +26,7 @@ public class WeeklyTimesheet {
 
     private int holidayUsed;
 
-    private int vacationDayUsed; // maximum of 3
+    private int vacationDayUsed; // maximum of 7
 
     private Document document;
 

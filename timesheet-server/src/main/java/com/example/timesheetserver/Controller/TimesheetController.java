@@ -1,17 +1,17 @@
 package com.example.timesheetserver.Controller;
 
-import com.example.timesheetserver.Domain.DailyTimesheet;
-import com.example.timesheetserver.Domain.Timesheet;
-import com.example.timesheetserver.Domain.WeeklyTimesheet;
+import com.example.timesheetserver.Domain.*;
 import com.example.timesheetserver.Service.AmazonClient;
 import com.example.timesheetserver.Service.ProfileService;
 import com.example.timesheetserver.Service.TimesheetService;
+import com.example.timesheetserver.Util.TimeManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Optional;
 
@@ -147,6 +147,57 @@ public class TimesheetController {
         } catch (Exception e) {
             e.printStackTrace();
             String message = "Failed to approve the timesheet";
+            ApiResponse<String> apiResponse = constructErrorResponse(message);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(apiResponse);
+        }
+    }
+
+    @CrossOrigin
+    @PostMapping("/generateTestTimesheet")
+    public ResponseEntity<ApiResponse<?>> generateTestTimesheet() throws DateTimeParseException {
+        try {
+            List<Profile> profileList = profileService.getAllProfiles();
+            for(Profile profile: profileList) {
+                String weekEnding = TimeManager.getWeekEndingOfCurrentWeek(); // e.g. 2023-11-25
+                List<DailyTimesheet> template = profile.getWeeklyTimesheetTemplate();
+                Timesheet timesheet = new Timesheet();
+                timesheet.setProfile(profile);
+                WeeklyTimesheet weeklyTimesheet = new WeeklyTimesheet();
+                weeklyTimesheet.setWeekEnding(weekEnding);
+                weeklyTimesheet.setSubmissionStatus("Not Started");
+                weeklyTimesheet.setApprovalStatus("N/A");
+                weeklyTimesheet.setTotalBillingHours(45);
+                weeklyTimesheet.setTotalCompensatedHours(45);
+                weeklyTimesheet.setFloatingDayUsed(0);
+                weeklyTimesheet.setVacationDayUsed(0);
+                List<DailyTimesheet> dailyTimesheets = TimeManager.setAllDatesByWeekEnding(template, weekEnding);
+                weeklyTimesheet.setDailyTimesheets(dailyTimesheets);
+
+                int holidayUsed = 0;
+                for(DailyTimesheet dailyTimesheet: dailyTimesheets) {
+                    if(dailyTimesheet.isHoliday()) {
+                        holidayUsed++;
+                    }
+                }
+                weeklyTimesheet.setHolidayUsed(holidayUsed);
+
+                Document document = new Document();
+                document.setType("");
+                document.setUrl("");
+                document.setTitle("");
+                document.setUploadedBy(profile.getName());
+                document.setUploadedTime("");
+                weeklyTimesheet.setDocument(document);
+                timesheet.setWeeklyTimesheet(weeklyTimesheet);
+                timesheetService.saveTimesheet(timesheet);
+            }
+            String data = "N/A";
+            String message = "Generated timesheets successfully";
+            ApiResponse<String> apiResponse = new ApiResponse<>(message, data);
+            return ResponseEntity.ok(apiResponse);
+        } catch (Exception e) {
+            e.printStackTrace();
+            String message = "Failed to generate timesheets";
             ApiResponse<String> apiResponse = constructErrorResponse(message);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(apiResponse);
         }
