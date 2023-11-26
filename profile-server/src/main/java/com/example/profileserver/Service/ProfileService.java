@@ -24,7 +24,7 @@ public class ProfileService {
     public Profile createProfile(Profile profile) {
         // add default values for some attributes
         profile.setRemainingFloatingDay(3);
-        profile.setRemainingVacationDay(0);
+        profile.setRemainingVacationDay(7);
         profile.setProfileAvatar("");
         String[] weekday = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
         List<DailyTimesheet> weeklyTimesheetTemplate = new ArrayList<>();
