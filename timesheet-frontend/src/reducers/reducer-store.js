@@ -4,8 +4,7 @@ const initialState = {
         id: '6562a44315353d2dfd584126'
     },
     summary_list: [],
-    selected_timesheet: {},
-    table_size : 5
+    selected_timesheet: {}
 }
 
 export default function appReducer(state = initialState, action) {
@@ -24,11 +23,6 @@ export default function appReducer(state = initialState, action) {
             return {
                 ...state,
                 selected_timesheet: action.payload
-            };
-        case 'ADD_TABLE_SIZE':
-            return {
-                ...state,
-                table_size: state.table_size + 5
             };
         default:
             return state;
