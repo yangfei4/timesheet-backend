@@ -1,6 +1,7 @@
-export default actionTypes = {
+const actionTypes = {
     SET_PROFILE: 'SET_PROFILE',
     SET_SUMMARY_LIST: 'SET_SUMMARY_LIST',
-    SET_SELECTED_TIMESHEET: 'SET_SELECTED_TIMESHEET',
-    ADD_TABLE_SIZE: 'ADD_TABLE_SIZE'
+    SET_SELECTED_TIMESHEET: 'SET_SELECTED_TIMESHEET'
 }
+
+export default actionTypes;
