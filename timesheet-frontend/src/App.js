@@ -2,6 +2,7 @@ import './App.scss';
 
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
 
 import Navbar from './components/Navbar';
 import Summary from './components/Summary';
@@ -10,19 +11,29 @@ import Profile from './components/Profile';
 import WelcomePage from './components/Pages/WelcomePage';
 import NotFoundPage from './components/Pages/NotFoundPage';
 
+import { getProfile_action } from './actions/actions';
+
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-function isLoggedIn() {
-  let curJWT = localStorage.getItem('JWT');
-  let curUserId = localStorage.getItem('userId');
-  // return curJWT && curUserId;
-  return true;
-}
-
 function App() {
+  const dispatch = useDispatch();
+
+  let isLoggedIn = () => {
+    localStorage.setItem('userId', "6562a44315353d2dfd584126"); // To be removed
+    let curJWT = localStorage.getItem('JWT');
+    let curUserId = localStorage.getItem('userId');
+    // return curJWT && curUserId;
+    return true;
+  }
+
+  if(isLoggedIn) {
+    localStorage.setItem('userId', "6562a44315353d2dfd584126"); // To be removed
+    console.log("useId in session: ", localStorage.getItem('userId'));
+    dispatch(getProfile_action(localStorage.getItem('userId')));
+  }
 
   return (
-    isLoggedIn() ? 
+    isLoggedIn ? 
       (<div className="App">
         <header className="App-header">
           <Navbar />
