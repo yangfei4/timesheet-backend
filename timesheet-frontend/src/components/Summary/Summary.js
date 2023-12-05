@@ -6,7 +6,7 @@ import Tooltip from '@mui/material/Tooltip';
 import InfoIcon from '@mui/icons-material/Info';
 
 import './Summary.scss';
-import { getSummaryList_action, setSelectedTimesheet_action } from '../../actions/actions';
+import { setSelectedTimesheet_action } from '../../actions/actions';
 import paginate from '../../utils/paginate';
 import Pagination from './Pagination';
 // import actionTypes from '../../actions/actionTypes';
@@ -20,14 +20,9 @@ const Summary = () => {
     const dispatch = useDispatch();
     const userId = localStorage.getItem('userId');
 
-    useEffect(() => {
-        dispatch(getSummaryList_action(userId));
-    }, [userId, dispatch]);
-
     const handlePageChange = (page) => {
         setCurrentPage(page);
     };
-
 
     const getSubmissionTagText = (timesheet) => {
         const submissionStatus = timesheet.weeklyTimesheet.submissionStatus;
@@ -90,8 +85,8 @@ const Summary = () => {
     }
 
     return (
-        <div>
-            <h1>Summary</h1>
+        <div className='table-container'>
+            <h2>Timesheet Summary</h2>
             <table className='table'>
                 <thead>
                     <tr>
@@ -105,7 +100,7 @@ const Summary = () => {
                 </thead>
                 <tbody>
                     {paginate(summaryList, currentPage, page_size).map((timesheet) => 
-                        <tr key={timesheet._id}>
+                        <tr key={timesheet.id}>
                             <td>{timesheet.weeklyTimesheet.weekEnding}</td>
                             <td>{timesheet.weeklyTimesheet.totalBillingHours}</td>
                             <td>
