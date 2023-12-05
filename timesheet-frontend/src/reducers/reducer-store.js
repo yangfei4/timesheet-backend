@@ -4,7 +4,7 @@ const initialState = {
         id: '6562a44315353d2dfd584126'
     },
     summary_list: [],
-    selected_timesheet: {}
+    selected_timesheet: null
 }
 
 export default function appReducer(state = initialState, action) {
