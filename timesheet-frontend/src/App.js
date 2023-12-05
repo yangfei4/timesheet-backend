@@ -11,7 +11,7 @@ import Profile from './components/Profile';
 import WelcomePage from './components/Pages/WelcomePage';
 import NotFoundPage from './components/Pages/NotFoundPage';
 
-import { getProfile_action } from './actions/actions';
+import { getProfile_action, getSummaryList_action, setSelectedTimesheet_action } from './actions/actions';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -28,8 +28,8 @@ function App() {
 
   if(isLoggedIn) {
     localStorage.setItem('userId', "6562a44315353d2dfd584126"); // To be removed
-    console.log("useId in session: ", localStorage.getItem('userId'));
     dispatch(getProfile_action(localStorage.getItem('userId')));
+    dispatch(getSummaryList_action(localStorage.getItem('userId')));
   }
 
   return (
@@ -38,13 +38,15 @@ function App() {
         <header className="App-header">
           <Navbar />
         </header>
-        <Routes>
-          <Route path="/summary" element={<Summary/>} />
-          <Route path="/timesheet" element={<Timesheet/>} />
-          <Route path="/profile" element={<Profile/>} />
-          <Route path="/" element={<Navigate to="/summary" />} />
-          <Route path="*" element={<NotFoundPage/>} />
-        </Routes>
+        <main className='page-container'>
+          <Routes>
+            <Route path="/summary" element={<Summary/>} />
+            <Route path="/timesheet" element={<Timesheet/>} />
+            <Route path="/profile" element={<Profile/>} />
+            <Route path="/" element={<Navigate to="/summary" />} />
+            <Route path="*" element={<NotFoundPage/>} />
+          </Routes>
+        </main>
       </div>
       )
       :

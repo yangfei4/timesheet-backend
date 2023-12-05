@@ -9,7 +9,7 @@ export const getProfile_action = (userId) => async (dispatch) => {
                     type: actionTypes.SET_PROFILE,
                     payload: response.data
                 });
-                console.log("successfully fetched user profile", response.data);
+                // console.log("successfully fetched user profile", response.data);
             });
     } catch (error) {
         console.log(error.message);
@@ -24,7 +24,7 @@ export const getSummaryList_action = (userId) => async (dispatch) => {
                     type: actionTypes.SET_SUMMARY_LIST,
                     payload: response.data
                 });
-                console.log("successfully fetched summary list", response.data);
+                // console.log("successfully fetched summary list", response.data);
             });
     } catch (error) {
         console.log(error.message);
@@ -37,7 +37,7 @@ export const setSelectedTimesheet_action = (timesheet) => async (dispatch) => {
             type: actionTypes.SET_SELECTED_TIMESHEET,
             payload: timesheet
         });
-        console.log("successfully set selected timesheet", timesheet);
+        // console.log("successfully set selected timesheet", timesheet);
     } catch (error) {
         console.log(error.message);
     }
