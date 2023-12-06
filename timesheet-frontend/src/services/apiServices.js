@@ -46,6 +46,37 @@ export const uploadDocument_api = async (userId, weekEnding, document) => {
         return response.data;
     } catch (error) {
         console.error('Error uploading document:', error);
-        throw error; // Rethrow the error to handle it elsewhere if needed
+        throw error;
     }
+};
+
+export const uploadProfileAvatar_api = async (userId, document) => {
+    try {
+        const formData = new FormData();
+        formData.append('document', document);
+        const response = await axios.post(
+            `http://localhost:11000/profile/uploadAvatar`,
+            formData,
+            {
+                params: {
+                    profileId: userId,
+                },
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                    'Access-Control-Allow-Origin': '*'
+                },
+            }
+        );
+
+        return response.data;
+    } catch (error) {
+        console.error('Error uploading avatar:', error);
+        throw error;
+    }
+}
+
+export const updateProfile_api = async (profile) => {
+    return axios.patch(`http://localhost:11000/profile/${profile.id}`, profile)
+        .then(res => res.data)
+        .catch(err => console.log(err));
 };
