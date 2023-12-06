@@ -103,16 +103,16 @@ public class ProfileController {
     }
 
     @CrossOrigin
-    @PostMapping(value = "/uploadAvatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    private ResponseEntity<ApiResponse<?>> updateAvatar(@RequestParam("userId") String id, @RequestParam("file") MultipartFile file) {
+    @PostMapping(value = "/uploadAvatar")
+    private ResponseEntity<ApiResponse<?>> updateAvatar(@RequestParam("profileId") String profileId, @RequestParam("document") MultipartFile document) {
         try {
-            String data = amazonClient.uploadAvatar(id, file);
-            String message = String.format("Upload avatar for user %s successfully", id);
+            String data = amazonClient.uploadAvatar(profileId, document);
+            String message = String.format("Upload avatar for user %s successfully", profileId);
             ApiResponse<String> apiResponse = new ApiResponse<>(message, data);
             return ResponseEntity.status(HttpStatus.CREATED).body(apiResponse);
         } catch (Exception e) {
             e.printStackTrace();
-            String message = "Failed to upload avatar for user" + id;
+            String message = "Failed to upload avatar for user" + profileId;
             ApiResponse<String> apiResponse = constructErrorResponse(message);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(apiResponse);
         }
