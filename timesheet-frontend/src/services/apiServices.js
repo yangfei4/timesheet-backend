@@ -11,3 +11,41 @@ export const getSummaryList_api = async (userId) => {
         .then(res => res.data)
         .catch(err => console.log(err));
 };
+
+export const updateTimesheet_api = async (userId, weeklyTimesheet) => {
+    return axios.patch(`http://localhost:10000/timesheet/${userId}`, weeklyTimesheet)
+        .then(res => res.data)
+        .catch(err => console.log(err));
+};
+
+export const updateTemplate_api = async (userId, template) => {
+    return axios.patch(`http://localhost:10000/timesheet/template/${userId}`, template)
+        .then(res => res.data)
+        .catch(err => console.log(err));
+};
+
+export const uploadDocument_api = async (userId, weekEnding, document) => {
+    try {
+        const formData = new FormData();
+        formData.append('document', document);
+        const response = await axios.patch(
+            'http://localhost:10000/timesheet/uploadDocument',
+            formData,
+            {
+                params: {
+                    profileId: userId,
+                    weekEnding: weekEnding,
+                },
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                    'Access-Control-Allow-Origin': '*'
+                },
+            }
+        );
+
+        return response.data;
+    } catch (error) {
+        console.error('Error uploading document:', error);
+        throw error; // Rethrow the error to handle it elsewhere if needed
+    }
+};

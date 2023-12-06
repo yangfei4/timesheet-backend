@@ -6,7 +6,7 @@ import { format, parseISO, set } from 'date-fns';
 import InfoIcon from '@mui/icons-material/Info';
 
 import { setSelectedTimesheet_action, updateTimesheet_action, getProfile_action } from '../../actions/actions';
-import { getProfile_api } from '../../services/apiServices';
+import { getProfile_api, updateTemplate_api, uploadDocument_api } from '../../services/apiServices';
 
 const Timesheet = () => {
     const dispatch = useDispatch();
@@ -161,8 +161,8 @@ const Timesheet = () => {
     }
 
     const postTemplate = () => {
-        // api service to upload template
         const template = newTimesheet.weeklyTimesheet.dailyTimesheets;
+        updateTemplate_api(profile.id, template);
         window.alert("saved as default successfully");
     }
 
@@ -296,7 +296,6 @@ const Timesheet = () => {
         };
 
         setNewTimesheet(latestNewTimesheet);
-        console.log("to be posted", latestNewTimesheet);
         dispatch(updateTimesheet_action(profile.id, latestNewTimesheet.weeklyTimesheet));
         // also re-fetch profile to update remaining floating and vacation days
         dispatch(getProfile_action(profile.id));
@@ -304,7 +303,9 @@ const Timesheet = () => {
 
     const uploadDocument = () => {
         // api service to upload file to amazonS3
-
+        if(docType && selectedDocument) {
+            uploadDocument_api(profile.id, newTimesheet.weeklyTimesheet.weekEnding, selectedDocument);
+        }
     }
 
     return (
