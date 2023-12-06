@@ -7,18 +7,31 @@ import InfoIcon from '@mui/icons-material/Info';
 
 import './Summary.scss';
 import { setSelectedTimesheet_action } from '../../actions/actions';
+import { getProfile_api } from '../../services/apiServices';
 import paginate from '../../utils/paginate';
 import Pagination from './Pagination';
 // import actionTypes from '../../actions/actionTypes';
 
 const Summary = () => {
 
+    const dispatch = useDispatch();
+    const userId = localStorage.getItem('userId');
+
     const summaryList = useSelector(state => state.summary_list);
+    const profile_store = useSelector(state => state.user_profile);
+
+    const [profile, setProfile] = useState(profile_store);
     const [currentPage, setCurrentPage] = useState(1);
     const page_size = 5;
 
-    const dispatch = useDispatch();
-    const userId = localStorage.getItem('userId');
+    // make sure the profile is the latest
+    useEffect(() => {
+        getProfile_api(userId)
+            .then(response => {
+                setProfile(response.data);
+            });
+    }, []);
+
 
     const handlePageChange = (page) => {
         setCurrentPage(page);
@@ -62,7 +75,7 @@ const Summary = () => {
 
         return (
             <span>
-                {floatingDayUsed>0 ? <div>Total floating day left in {new Date().getFullYear()}: {timesheet.profile.remainingFloatingDay} days </div> : null}
+                {floatingDayUsed>0 ? <div>Total floating day left in {new Date().getFullYear()}: {profile.remainingFloatingDay} days </div> : null}
             </span>
         )
     }
@@ -72,7 +85,7 @@ const Summary = () => {
 
         return (
             <span>
-                {vacationDayUsed>0 ? <div>Total vacation day left in {new Date().getFullYear()}: {timesheet.profile.remainingVacationDay} days </div> : null} <div></div>
+                {vacationDayUsed>0 ? <div>Total vacation day left in {new Date().getFullYear()}: {profile.remainingVacationDay} days </div> : null} <div></div>
             </span>
         )
     }
