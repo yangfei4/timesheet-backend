@@ -2,12 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Grid, FormControl, InputLabel, Select, MenuItem, styled, TextField, Alert, 
     Button, Tooltip, TableContainer, Table, TableHead, TableBody, TableRow, TableCell, Checkbox } from '@mui/material';
-import { format, parseISO } from 'date-fns';
+import { format, parseISO, set } from 'date-fns';
 import InfoIcon from '@mui/icons-material/Info';
 
-
-import { setSelectedTimesheet_action } from '../../actions/actions';
-import { Tab } from 'react-bootstrap';
+import { setSelectedTimesheet_action, updateTimesheet_action, getProfile_action } from '../../actions/actions';
+import { getProfile_api } from '../../services/apiServices';
 
 const Timesheet = () => {
     const dispatch = useDispatch();
@@ -16,11 +15,12 @@ const Timesheet = () => {
     const summaryList = useSelector(state => state.summary_list);
     const user_profile = useSelector(state => state.user_profile);
 
+    const [profile, setProfile] = useState(user_profile);
     const [newTimesheet, setNewTimesheet] = useState(selected_timesheet);
     const [isValid, setValid] = useState(true);
     const [isApproved, setApproved] = useState(false);
-    const [floatingDayRemain, setFloatingDayRemain] = useState(user_profile.remainingFloatingDay);
-    const [vacationDayRemain, setVacationDayRemain] = useState(user_profile.remainingVacationDay);
+    const [floatingDayRemain, setFloatingDayRemain] = useState(profile.remainingFloatingDay);
+    const [vacationDayRemain, setVacationDayRemain] = useState(profile.remainingVacationDay);
     const [floatingDayAllowed, setFloatingDayAllowed] = useState(true);
     const [vacationDayAllowed, setVacationDayAllowed] = useState(true);
     const [notify, setNotify] = useState(false);
@@ -34,6 +34,13 @@ const Timesheet = () => {
             dispatch(setSelectedTimesheet_action(latestTimesheet));
             setNewTimesheet(latestTimesheet);
         }
+        getProfile_api(user_profile.id).
+            then(response => {
+                setProfile(response.data);
+                setFloatingDayRemain(response.data.remainingFloatingDay);
+                setVacationDayRemain(response.data.remainingVacationDay);
+            }
+        );
     }, [dispatch, summaryList, selected_timesheet]);
 
     // Update selected timesheet, including its billing, compensated hours, starting time, ending time
@@ -43,13 +50,13 @@ const Timesheet = () => {
             setApproved(true);
         }
 
-        if(newTimesheet && user_profile && (user_profile.remainingFloatingDay <=0 || floatingDayRemain <= 0)) {
+        if(newTimesheet && profile && (profile.remainingFloatingDay <=0 || floatingDayRemain <= 0)) {
             setFloatingDayAllowed(false);
         } else {
             setFloatingDayAllowed(true);
         }
 
-        if(newTimesheet && user_profile && (user_profile.remainingVacationDay <=0 || vacationDayRemain <= 0)) {
+        if(newTimesheet && profile && (profile.remainingVacationDay <=0 || vacationDayRemain <= 0)) {
             setVacationDayAllowed(false);
         } else {
             setVacationDayAllowed(true);
@@ -141,8 +148,8 @@ const Timesheet = () => {
             floatingDay: false,
             vacationDay: false
         }));
-        setFloatingDayRemain(user_profile.remainingFloatingDay);
-        setVacationDayRemain(user_profile.remainingVacationDay);
+        setFloatingDayRemain(profile.remainingFloatingDay);
+        setVacationDayRemain(profile.remainingVacationDay);
 
         setNewTimesheet({
             ...newTimesheet,
@@ -290,8 +297,9 @@ const Timesheet = () => {
 
         setNewTimesheet(latestNewTimesheet);
         console.log("to be posted", latestNewTimesheet);
-        // api service to post timesheet
-
+        dispatch(updateTimesheet_action(profile.id, latestNewTimesheet.weeklyTimesheet));
+        // also re-fetch profile to update remaining floating and vacation days
+        dispatch(getProfile_action(profile.id));
     }
 
     const uploadDocument = () => {
