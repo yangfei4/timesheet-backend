@@ -95,7 +95,7 @@ public class AmazonClient {
                 document.setTitle(fileName);
                 document.setUploadedTime(TimeManager.getCurrentTime());
                 document.setUploadedBy(timesheet.getProfile().getName());
-                document.setType("document"); //TODO(Yangfei): finalize this
+                // document.setType("approved timesheet"); // this has been set through updateTimesheet api
                 timesheetService.saveTimesheet(timesheet);
                 uploadFileToS3Bucket(fileName, file);
                 file.delete();
