@@ -1,22 +1,39 @@
 import React, { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { Grid, FormControl, InputLabel, OutlinedInput, Button, TextField } from '@mui/material';
 
 import './Profile.scss';
-import { getProfile_api } from '../../services/apiServices';
+// import {  } from '../../actions/actions';
+import { getProfile_api, uploadProfileAvatar_api, updateProfile_api } from '../../services/apiServices';
 
 const Profile = () => {
-
     const profile_store = useSelector(state => state.user_profile);
     const [profile, setProfile] = useState(profile_store);
     const [document, setDocument] = useState(null);
 
+    useEffect(() => {
+        // make sure to get the latest profile from the database
+        getProfile_api(profile_store.id)
+            .then(response => {
+                setProfile(response.data);
+            });
+    }, []);
+
     const handleFileInput = (e) => {
-        setDocument(e.target.files[0]);
+        if (e.target.files && e.target.files.length > 0) {
+            setDocument(e.target.files[0]);
+        }
     }
 
-    const uploadDocument = () => {
+    const uploadAvatar = () => {
         // api service to upload document to amazon s3
+        if(document) {
+            uploadProfileAvatar_api(profile.id, document)
+                .then(response => {
+                    setProfile({ ...profile, profileAvatar: response.data });
+                    updateProfile_api({ ...profile, profileAvatar: response.data });
+                });
+        }
     }
 
     const handleContactChange = (prop) => (event) => {
@@ -30,8 +47,7 @@ const Profile = () => {
     }
 
     const updateProfile = () => {
-        console.log('updateProfile');
-        // api service to update profile
+        updateProfile_api(profile);
     }
 
     return (
@@ -56,10 +72,9 @@ const Profile = () => {
                                 <img src={(profile?.profileAvatar)?profile.profileAvatar:"http://www.gravatar.com/avatar/?d=mp"} alt="Avatar" className='avatar'></img>
                             </div>
                             <div className='img-buttons'>
-                                <label for="img">Select Avatar:&nbsp;&nbsp;</label>
-                                <input type="file" onChange={handleFileInput} id="img" name="img" accept=".pdf, .doc, .docx, .jpeg, .xlsx, .jpg"></input>
-                                {/* <br></br> */}
-                                <Button variant="contained" color="primary" onClick={uploadDocument}>
+                                <label htmlFor="img">Select Avatar:&nbsp;&nbsp;</label>
+                                <input type="file" onChange={handleFileInput} id="img" name="img" accept=".pdf, .doc, .docx, .jpeg, .xlsx, .jpg, .png"></input>
+                                <Button variant="contained" color="primary" onClick={uploadAvatar}>
                                     Save
                                 </Button>
                             </div>
@@ -96,8 +111,8 @@ const Profile = () => {
                                 Save
                                 </Button>
                             </div>
-                            {profile?.contact.emergencyContacts?.map((row, index) => (
-                                <div>
+                            {profile?.contact?.emergencyContacts?.map((row, index) => (
+                                <div key={index}>
                                     <div className='row'>
                                         <h5>
                                             Emergency Contact {index + 1}
