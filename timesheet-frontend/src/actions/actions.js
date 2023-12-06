@@ -1,4 +1,4 @@
-import { getProfile_api, getSummaryList_api } from "../services/apiServices";
+import { getProfile_api, getSummaryList_api, updateTimesheet_api } from "../services/apiServices";
 import actionTypes from "./actionTypes";
 
 export const getProfile_action = (userId) => async (dispatch) => {
@@ -38,6 +38,21 @@ export const setSelectedTimesheet_action = (timesheet) => async (dispatch) => {
             payload: timesheet
         });
         // console.log("successfully set selected timesheet", timesheet);
+    } catch (error) {
+        console.log(error.message);
+    }
+};
+
+export const updateTimesheet_action = (userId, weeklyTimesheet) => async (dispatch) => {
+    try {
+        await updateTimesheet_api(userId, weeklyTimesheet)
+            .then(response => {
+                dispatch({
+                    type: actionTypes.UPDATE_TIMESHEET,
+                    payload: response.data
+                });
+                // console.log("successfully updated timesheet", response.data);
+            });
     } catch (error) {
         console.log(error.message);
     }
