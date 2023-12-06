@@ -1,6 +1,7 @@
 package com.example.profileserver.Controller;
 
 
+import com.example.profileserver.DAO.ProfileRepository;
 import com.example.profileserver.Service.AmazonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -87,7 +88,7 @@ public class ProfileController {
     }
 
     @CrossOrigin
-    @PatchMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PatchMapping(value = "/contact/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiResponse<?>> updateContact(@PathVariable String id, @RequestBody Contact contact) {
         try {
             Contact data = profileService.updateContact(id, contact);
@@ -97,6 +98,22 @@ public class ProfileController {
         } catch (Exception e) {
             e.printStackTrace();
             String message = "Failed to update Contact for user" + id;
+            ApiResponse<String> apiResponse = constructErrorResponse(message);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(apiResponse);
+        }
+    }
+
+    @CrossOrigin
+    @PatchMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ApiResponse<?>> updateProfile(@PathVariable String id, @RequestBody Profile profile) {
+        try {
+            Profile data = profileService.updateProfile(id, profile);
+            String message = String.format("Update profile for user %s successfully", id);
+            ApiResponse<Profile> apiResponse = new ApiResponse<Profile>(message, data);
+            return ResponseEntity.ok(apiResponse);
+        } catch (Exception e) {
+            e.printStackTrace();
+            String message = "Failed to update Profile for user" + id;
             ApiResponse<String> apiResponse = constructErrorResponse(message);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(apiResponse);
         }
