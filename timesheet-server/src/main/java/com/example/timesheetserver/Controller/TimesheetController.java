@@ -166,8 +166,8 @@ public class TimesheetController {
                 weeklyTimesheet.setWeekEnding(weekEnding);
                 weeklyTimesheet.setSubmissionStatus("Not Started");
                 weeklyTimesheet.setApprovalStatus("N/A");
-                weeklyTimesheet.setTotalBillingHours(45);
-                weeklyTimesheet.setTotalCompensatedHours(45);
+                weeklyTimesheet.setTotalBillingHours(40);
+                weeklyTimesheet.setTotalCompensatedHours(40);
                 weeklyTimesheet.setFloatingDayUsed(0);
                 weeklyTimesheet.setVacationDayUsed(0);
                 List<DailyTimesheet> dailyTimesheets = TimeManager.setAllDatesByWeekEnding(template, weekEnding);
