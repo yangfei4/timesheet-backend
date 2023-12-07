@@ -42,7 +42,7 @@ public class ProfileService {
             }
             else {
                 dailyTimesheet.setStartingTime("09:00");
-                dailyTimesheet.setEndingTime("18:00");
+                dailyTimesheet.setEndingTime("17:00");
             }
             weeklyTimesheetTemplate.add(dailyTimesheet);
         }
