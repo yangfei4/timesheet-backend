@@ -1,0 +1,44 @@
+server:
+  port: 9000
+
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+#    instance:
+#      preferIpAddress: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+
+spring:
+  application:
+    name: gateway-server
+  cloud:
+    gateway:
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials, RETAIN_UNIQUE
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins: "*"
+            allowedHeaders: "*"
+            allowedMethods: "*"
+      routes:
+        - id: profile-server
+          uri: http://localhost:11000/
+          predicates:
+            - Path=/profile/**
+
+        #- id: summary-server
+        #  uri: http://localhost:12000/
+        #  predicates:
+        #    - Path=/summary/**
+
+        - id: timesheet-server
+          uri: lb://timesheet-server
+          predicates:
+            - Path=/timesheet/**
+
+# lb: specify load-balanced URLs
+# predicates: used to determine which routes should be executed based on certain conditions.
+# In this case, the condition is Path matching
