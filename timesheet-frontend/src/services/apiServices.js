@@ -1,25 +1,25 @@
 import axios from 'axios';
 
 export const getProfile_api = async (userId) => {
-    return axios.get(`http://localhost:11000/profile/${userId}`)
+    return axios.get(`http://localhost:9000/profile/${userId}`)
         .then(res => res.data)
         .catch(err => console.log(err));
 };
 
 export const getSummaryList_api = async (userId) => {
-    return axios.get(`http://localhost:10000/timesheet/summary/${userId}`)
+    return axios.get(`http://localhost:9000/timesheet/summary/${userId}`)
         .then(res => res.data)
         .catch(err => console.log(err));
 };
 
 export const updateTimesheet_api = async (userId, weeklyTimesheet) => {
-    return axios.patch(`http://localhost:10000/timesheet/${userId}`, weeklyTimesheet)
+    return axios.patch(`http://localhost:9000/timesheet/${userId}`, weeklyTimesheet)
         .then(res => res.data)
         .catch(err => console.log(err));
 };
 
 export const updateTemplate_api = async (userId, template) => {
-    return axios.patch(`http://localhost:10000/timesheet/template/${userId}`, template)
+    return axios.patch(`http://localhost:9000/timesheet/template/${userId}`, template)
         .then(res => res.data)
         .catch(err => console.log(err));
 };
@@ -29,7 +29,7 @@ export const uploadDocument_api = async (userId, weekEnding, document) => {
         const formData = new FormData();
         formData.append('document', document);
         const response = await axios.patch(
-            'http://localhost:10000/timesheet/uploadDocument',
+            'http://localhost:9000/timesheet/uploadDocument',
             formData,
             {
                 params: {
@@ -37,8 +37,7 @@ export const uploadDocument_api = async (userId, weekEnding, document) => {
                     weekEnding: weekEnding,
                 },
                 headers: {
-                    'Content-Type': 'multipart/form-data',
-                    'Access-Control-Allow-Origin': '*'
+                    'Content-Type': 'multipart/form-data'
                 },
             }
         );
@@ -55,16 +54,15 @@ export const uploadProfileAvatar_api = async (userId, document) => {
         const formData = new FormData();
         formData.append('document', document);
         const response = await axios.post(
-            `http://localhost:11000/profile/uploadAvatar`,
+            `http://localhost:9000/profile/uploadAvatar`,
             formData,
             {
                 params: {
                     profileId: userId,
                 },
                 headers: {
-                    'Content-Type': 'multipart/form-data',
-                    'Access-Control-Allow-Origin': '*'
-                },
+                    'Content-Type': 'multipart/form-data'
+                }
             }
         );
 
@@ -76,7 +74,7 @@ export const uploadProfileAvatar_api = async (userId, document) => {
 }
 
 export const updateProfile_api = async (profile) => {
-    return axios.patch(`http://localhost:11000/profile/${profile.id}`, profile)
+    return axios.patch(`http://localhost:9000/profile/${profile.id}`, profile)
         .then(res => res.data)
         .catch(err => console.log(err));
 };
