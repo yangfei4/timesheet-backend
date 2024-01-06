@@ -22,4 +22,13 @@ public class UserService implements UserDetailsService {
         return userRepository.findByUsername(username).orElseThrow(()
                 -> new UsernameNotFoundException("Username " + username + " not found"));
     }
+
+    public boolean existsUserByUsername(String username) {
+        return userRepository.existsUserByUsername(username);
+    }
+
+    public void saveUser(User user) {
+        userRepository.save(user);
+    }
+
 }
