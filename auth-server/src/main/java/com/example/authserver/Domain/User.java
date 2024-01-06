@@ -32,15 +32,18 @@ public class User implements Serializable, UserDetails {
     private String password;
     @Column(name = "profile_id")
     private String profile_id;
+    @Column(name = "role")
+    private String role;
 
     @Transient
     private final Set<GrantedAuthority> authorities = new HashSet<>();
 
-    // @Transient
-    // private List<String> roles = new ArrayList<>();
+    @Transient
+    private List<String> roles = new ArrayList<>();
 
     public User() {
-        authorities.add(new SimpleGrantedAuthority("USER"));
+        authorities.add(new SimpleGrantedAuthority(role));
+        roles.add(role);
         // ... add further roles if required. e.g. MANAGER
     }
 
