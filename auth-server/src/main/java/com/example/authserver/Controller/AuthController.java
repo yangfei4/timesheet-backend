@@ -46,19 +46,17 @@ public class AuthController {
             String username = loginRequest.getUsername();
             String password = loginRequest.getPassword();
             String profile_id = loginRequest.getProfile_id();
+            String role = loginRequest.getRole();
             // check if the username already exists
             if(userService.existsUserByUsername(username)) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Username is already taken");
             }
 
-            // create a new user
-            User user = new User();
-            user.setRole("USER");
-            user.setProfile_id(profile_id);
-
             // encrypt the password before saving it in db
             String encryptedPassword = passwordEncoder.encode(password);
-            user.setPassword(encryptedPassword);
+
+            // create a new user
+            User user = new User(username, encryptedPassword, profile_id, role);
 
             // save the user to the db
             userService.saveUser(user);
