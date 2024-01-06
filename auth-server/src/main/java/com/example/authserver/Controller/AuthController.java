@@ -12,34 +12,79 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
-import javax.naming.AuthenticationException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
+import java.util.SimpleTimeZone;
 
 @RestController
 @CrossOrigin
 @RequestMapping("/auth")
 public class AuthController {
-    private UserService userService;
-
-    private AuthenticationManager authenticationManager;
+    private final UserService userService;
+    private final AuthenticationManager authenticationManager;
+    private final JwtTokenProvider jwtTokenProvider;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public void setUserService(UserService userService) {
+    public AuthController(UserService userService,
+                          AuthenticationManager authenticationManager,
+                          JwtTokenProvider jwtTokenProvider,
+                          PasswordEncoder passwordEncoder) {
         this.userService = userService;
+        this.authenticationManager = authenticationManager;
+        this.jwtTokenProvider = jwtTokenProvider;
+        this.passwordEncoder = passwordEncoder;
     }
 
-    @Autowired
-    public void setAuthenticationManager(AuthenticationManager authenticationManager) {
-        this.authenticationManager = authenticationManager;
+    @PostMapping("/signup")
+    public ResponseEntity<Object> signup(@RequestBody LoginRequest loginRequest) {
+        try {
+            String username = loginRequest.getUsername();
+            String password = loginRequest.getPassword();
+            String profile_id = loginRequest.getProfile_id();
+            // check if the username already exists
+            if(userService.existsUserByUsername(username)) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Username is already taken");
+            }
+
+            // create a new user
+            User user = new User();
+            user.setRole("USER");
+            user.setProfile_id(profile_id);
+
+            // encrypt the password before saving it in db
+            String encryptedPassword = passwordEncoder.encode(password);
+            user.setPassword(encryptedPassword);
+
+            // save the user to the db
+            userService.saveUser(user);
+
+            // login the user and generate JWT
+            Authentication authentication = new UsernamePasswordAuthenticationToken(username, password);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+
+            List<String> roles = user.getRoles();
+            String token = jwtTokenProvider.createToken(username, roles);
+
+            // return profile_id and JWT to the client
+            Map<Object, Object> model = new HashMap<>();
+            model.put("profile_id", profile_id);
+            model.put("token", token);
+
+            return ResponseEntity.status(HttpStatus.CREATED).body(model);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error during user registration");
+        }
     }
 
     @PostMapping("/login")
-    public ResponseEntity login(@RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<Object> login(@RequestBody LoginRequest loginRequest) {
         try {
             String username = loginRequest.getUsername();
             String password = loginRequest.getPassword();
@@ -53,7 +98,7 @@ public class AuthController {
             List<String> roles = user.getRoles();
             String profile_id = user.getProfile_id();
 
-            String token = new JwtTokenProvider().createToken(username, roles);
+            String token = jwtTokenProvider.createToken(username, roles);
 
             // return map(profile_id -> jwt) to client
             Map<Object, Object> model = new HashMap<>();
@@ -61,11 +106,9 @@ public class AuthController {
             model.put("token", token);
 
             return ResponseEntity.ok(model);
-
         }
         catch (BadCredentialsException e) {
             e.printStackTrace();
-            String badUserName = loginRequest.getUsername();
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username or password");
         }
     }
