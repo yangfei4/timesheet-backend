@@ -18,6 +18,7 @@ import java.util.*;
 @Setter
 @ToString
 @AllArgsConstructor
+@NoArgsConstructor
 public class User implements Serializable, UserDetails {
     // Class 'User' must either be declared abstract or implement abstract method
     // getAuthorities() isAccountNonExpired() isAccountNonLocked() isCredentialsNonExpired() isEnabled()
@@ -41,7 +42,12 @@ public class User implements Serializable, UserDetails {
     @Transient
     private List<String> roles = new ArrayList<>();
 
-    public User() {
+    public User(String username, String password, String profile_id, String role) {
+        this.username = username;
+        this.password = password;
+        this.profile_id = profile_id;
+        this.role = role;
+
         authorities.add(new SimpleGrantedAuthority(role));
         roles.add(role);
         // ... add further roles if required. e.g. MANAGER
