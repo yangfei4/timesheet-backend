@@ -73,19 +73,17 @@ public class ProfileController {
 
     @CrossOrigin
     @PostMapping(value = "/create", consumes = MediaType.TEXT_PLAIN_VALUE)
-    public ResponseEntity<ApiResponse<?>> createProfileFromAuth(@RequestBody String username) {
+    public ResponseEntity<String> createProfileFromAuth(@RequestBody String username) {
         try {
             Profile profile = new Profile();
             profile.setName(username);
             Profile data = profileService.createProfile(profile);
-            String message = "Profile created successfully";
-            ApiResponse<Profile> apiResponse = new ApiResponse<Profile>(message, data);
-            return ResponseEntity.status(HttpStatus.CREATED).body(apiResponse);
+            return ResponseEntity.status(HttpStatus.CREATED).body(data.getId());
         } catch (Exception e) {
             e.printStackTrace();
             String message = "Failed to create new profile";
             ApiResponse<String> apiResponse = constructErrorResponse(message);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(apiResponse);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Fail to create Profile");
         }
     }
 
