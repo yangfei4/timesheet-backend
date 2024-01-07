@@ -60,7 +60,7 @@ public class HibernateConfig {
         return dataSource;
     }
 
-    @Bean
+    @Bean(name = "transactionManager")
     public PlatformTransactionManager hibernateTransactionManager() {
         // HibernateTransactionManager hibernateTransactionManage = new HibernateTransactionManager();
         // hibernateTransactionManager.setSessionFactory(sessionFactory().getObject());
