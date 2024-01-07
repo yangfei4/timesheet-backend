@@ -1,9 +1,12 @@
 package com.example.authserver.Controller;
 
 import com.example.authserver.Domain.User;
+import com.example.authserver.Feign.ProfileClient;
 import com.example.authserver.Requests.LoginRequest;
 import com.example.authserver.Security.JwtTokenProvider;
 import com.example.authserver.Service.UserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +21,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.SimpleTimeZone;
 
 @RestController
 @CrossOrigin
@@ -28,16 +30,21 @@ public class AuthController {
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
+    private final ProfileClient profileClient;
+
+    private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
 
     @Autowired
     public AuthController(UserService userService,
                           AuthenticationManager authenticationManager,
                           JwtTokenProvider jwtTokenProvider,
-                          PasswordEncoder passwordEncoder) {
+                          PasswordEncoder passwordEncoder,
+                          ProfileClient profileClient) {
         this.userService = userService;
         this.authenticationManager = authenticationManager;
         this.jwtTokenProvider = jwtTokenProvider;
         this.passwordEncoder = passwordEncoder;
+        this.profileClient = profileClient;
     }
 
     @PostMapping("/signup")
@@ -45,8 +52,10 @@ public class AuthController {
         try {
             String username = loginRequest.getUsername();
             String password = loginRequest.getPassword();
-            String profile_id = loginRequest.getProfile_id();
             String role = loginRequest.getRole();
+            logger.info("Right Here!!!!!");
+            logger.info("Received loginRequest " + loginRequest.toString());
+
             // check if the username already exists
             if(userService.existsUserByUsername(username)) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Username is already taken");
@@ -54,6 +63,9 @@ public class AuthController {
 
             // encrypt the password before saving it in db
             String encryptedPassword = passwordEncoder.encode(password);
+
+            // create a new Profile through ProfileClient and get profile_id
+            String profile_id = profileClient.createProfileFromAuth(username).getBody();
 
             // create a new user
             User user = new User(username, encryptedPassword, profile_id, role);
@@ -111,4 +123,16 @@ public class AuthController {
         }
     }
 
+    @PostMapping("/logout")
+    public ResponseEntity<Object> logout() {
+        try {
+            // For simplicity, you can clear the SecurityContext to "logout" the user
+            SecurityContextHolder.clearContext();
+
+            return ResponseEntity.ok("Logout successful");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error during logout");
+        }
+    }
 }
