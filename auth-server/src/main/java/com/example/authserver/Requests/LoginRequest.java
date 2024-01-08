@@ -12,4 +12,5 @@ public class LoginRequest {
     private String password;
     private String profile_id;
     private String role;
+    private String email;
 }

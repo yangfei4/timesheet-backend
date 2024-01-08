@@ -53,6 +53,7 @@ public class AuthController {
             String username = loginRequest.getUsername();
             String password = loginRequest.getPassword();
             String role = loginRequest.getRole();
+            String email = loginRequest.getEmail();
             logger.info("Right Here!!!!!");
             logger.info("Received loginRequest " + loginRequest.toString());
 
@@ -65,7 +66,10 @@ public class AuthController {
             String encryptedPassword = passwordEncoder.encode(password);
 
             // create a new Profile through ProfileClient and get profile_id
-            String profile_id = profileClient.createProfileFromAuth(username).getBody();
+            UserProfileRequest userProfileRequest = new UserProfileRequest();
+            userProfileRequest.setUsername(username);
+            userProfileRequest.setEmail(email);
+            String profile_id = profileClient.createProfileFromAuth(userProfileRequest).getBody();
 
             // create a new user
             User user = new User(username, encryptedPassword, profile_id, role);

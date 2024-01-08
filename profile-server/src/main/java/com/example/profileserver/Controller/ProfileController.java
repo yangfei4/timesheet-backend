@@ -73,10 +73,15 @@ public class ProfileController {
 
     @CrossOrigin
     @PostMapping(value = "/create", consumes = MediaType.TEXT_PLAIN_VALUE)
-    public ResponseEntity<String> createProfileFromAuth(@RequestBody String username) {
+    public ResponseEntity<String> createProfileFromAuth(@RequestBody UserProfileRequest userProfileRequest) {
         try {
+            String username = userProfileRequest.getUsername();
+            String email = userProfileRequest.getEmail();
             Profile profile = new Profile();
             profile.setName(username);
+            Contact contact = new Contact();
+            contact.setEmail(email);
+            profile.setContact(contact);
             Profile data = profileService.createProfile(profile);
             return ResponseEntity.status(HttpStatus.CREATED).body(data.getId());
         } catch (Exception e) {
