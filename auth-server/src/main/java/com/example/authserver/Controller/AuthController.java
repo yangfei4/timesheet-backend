@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -97,7 +98,7 @@ public class AuthController {
         }
     }
 
-    @PostMapping("/login")
+    @PostMapping(value = "/login", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> login(@RequestBody LoginRequest loginRequest) {
         try {
             String username = loginRequest.getUsername();
@@ -133,7 +134,7 @@ public class AuthController {
             // For simplicity, you can clear the SecurityContext to "logout" the user
             SecurityContextHolder.clearContext();
 
-            return ResponseEntity.ok("Logout successful");
+            return ResponseEntity.ok("Logout successfully");
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error during logout");

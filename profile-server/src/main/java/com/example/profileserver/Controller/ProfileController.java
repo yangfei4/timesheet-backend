@@ -72,7 +72,7 @@ public class ProfileController {
     }
 
     @CrossOrigin
-    @PostMapping(value = "/create", consumes = MediaType.TEXT_PLAIN_VALUE)
+    @PostMapping(value = "/create", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> createProfileFromAuth(@RequestBody UserProfileRequest userProfileRequest) {
         try {
             String username = userProfileRequest.getUsername();
