@@ -83,11 +83,10 @@ public class AuthController {
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
             List<String> roles = user.getRoles();
-            String token = jwtTokenProvider.createToken(username, roles);
+            String token = jwtTokenProvider.createToken(profile_id, roles);
 
             // return profile_id and JWT to the client
             Map<Object, Object> model = new HashMap<>();
-            model.put("profile_id", profile_id);
             model.put("token", token);
 
             return ResponseEntity.status(HttpStatus.CREATED).body(model);
@@ -113,11 +112,10 @@ public class AuthController {
             List<String> roles = user.getRoles();
             String profile_id = user.getProfile_id();
 
-            String token = jwtTokenProvider.createToken(username, roles);
+            String token = jwtTokenProvider.createToken(profile_id, roles);
 
             // return map(profile_id -> jwt) to client
             Map<Object, Object> model = new HashMap<>();
-            model.put("profile_id", profile_id);
             model.put("token", token);
 
             return ResponseEntity.ok(model);

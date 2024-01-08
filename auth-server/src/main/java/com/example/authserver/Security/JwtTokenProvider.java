@@ -15,8 +15,8 @@ public class JwtTokenProvider {
     @Value("${security.jwt.token.secret-key}")
     private String secretKey;
 
-    public String createToken(String username, List<String> roles) {
-        Claims claims = Jwts.claims().setSubject(username);
+    public String createToken(String profile_id, List<String> roles) {
+        Claims claims = Jwts.claims().setSubject(profile_id);
         claims.put("roles", roles);
         Date expirationDate = new Date(System.currentTimeMillis() + 3600000); // 1 hour in milliseconds
 
