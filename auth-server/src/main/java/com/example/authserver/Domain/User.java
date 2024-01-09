@@ -1,5 +1,6 @@
 package com.example.authserver.Domain;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.*;
 import org.springframework.data.web.HateoasPageableHandlerMethodArgumentResolver;
 import org.springframework.security.core.GrantedAuthority;
@@ -42,6 +43,7 @@ public class User implements Serializable, UserDetails {
     @Transient
     private List<String> roles = new ArrayList<>();
 
+    @JsonCreator
     public User(String username, String password, String profile_id, String role) {
         this.username = username;
         this.password = password;
