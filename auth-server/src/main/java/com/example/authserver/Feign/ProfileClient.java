@@ -1,6 +1,5 @@
 package com.example.authserver.Feign;
 
-import com.example.authserver.Controller.ApiResponse;
 import com.example.authserver.Controller.UserProfileRequest;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;

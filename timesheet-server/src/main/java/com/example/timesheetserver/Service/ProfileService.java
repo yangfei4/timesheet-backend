@@ -6,6 +6,7 @@ import com.example.timesheetserver.Domain.Profile;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.security.PublicKey;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,6 +29,10 @@ public class ProfileService {
 
     public List<Profile> getAllProfiles() {
         return profileRepository.findAll();
+    }
+
+    public Optional<Profile> getProfileById(String profile_id) {
+        return profileRepository.findById(profile_id);
     }
 
 }

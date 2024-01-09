@@ -1,5 +1,6 @@
 package com.example.timesheetserver.Controller;
 
+import com.amazonaws.services.apigateway.model.Op;
 import com.example.timesheetserver.Domain.*;
 import com.example.timesheetserver.Service.AmazonClient;
 import com.example.timesheetserver.Service.ProfileService;
@@ -193,6 +194,63 @@ public class TimesheetController {
             }
             String data = "N/A";
             String message = "Generated timesheets successfully";
+            ApiResponse<String> apiResponse = new ApiResponse<>(message, data);
+            return ResponseEntity.ok(apiResponse);
+        } catch (Exception e) {
+            e.printStackTrace();
+            String message = "Failed to generate timesheets";
+            ApiResponse<String> apiResponse = constructErrorResponse(message);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(apiResponse);
+        }
+    }
+
+    @CrossOrigin
+    @PostMapping("/generateTimesheetCurweek/{profile_id}")
+    public ResponseEntity<ApiResponse<?>> generateTimesheetCurweek(@PathVariable String profile_id) {
+        try {
+            Optional<Profile> Opt = profileService.getProfileById(profile_id);
+            String message;
+            if(Opt.isPresent()){
+                Profile profile = Opt.get();
+                String weekEnding = TimeManager.getWeekEndingOfCurrentWeek(); // e.g. 2023-11-25
+                List<DailyTimesheet> template = profile.getWeeklyTimesheetTemplate();
+                Timesheet timesheet = new Timesheet();
+                timesheet.setProfile(profile);
+                WeeklyTimesheet weeklyTimesheet = new WeeklyTimesheet();
+                weeklyTimesheet.setWeekEnding(weekEnding);
+                weeklyTimesheet.setSubmissionStatus("Not Started");
+                weeklyTimesheet.setApprovalStatus("N/A");
+                weeklyTimesheet.setTotalBillingHours(40);
+                weeklyTimesheet.setTotalCompensatedHours(40);
+                weeklyTimesheet.setFloatingDayUsed(0);
+                weeklyTimesheet.setVacationDayUsed(0);
+                List<DailyTimesheet> dailyTimesheets = TimeManager.setAllDatesByWeekEnding(template, weekEnding);
+                weeklyTimesheet.setDailyTimesheets(dailyTimesheets);
+
+                int holidayUsed = 0;
+                for(DailyTimesheet dailyTimesheet: dailyTimesheets) {
+                    if(dailyTimesheet.isHoliday()) {
+                        holidayUsed++;
+                    }
+                }
+                weeklyTimesheet.setHolidayUsed(holidayUsed);
+
+                Document document = new Document();
+                document.setType("");
+                document.setUrl("");
+                document.setTitle("");
+                document.setUploadedBy(profile.getName());
+                document.setUploadedTime("");
+                weeklyTimesheet.setDocument(document);
+                timesheet.setWeeklyTimesheet(weeklyTimesheet);
+                timesheetService.saveTimesheet(timesheet);
+                message = "Generated timesheets successfully";
+            }
+            else {
+                message = "profile not exist";
+            }
+
+            String data = "N/A";
             ApiResponse<String> apiResponse = new ApiResponse<>(message, data);
             return ResponseEntity.ok(apiResponse);
         } catch (Exception e) {
