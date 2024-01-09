@@ -39,6 +39,11 @@ spring:
           predicates:
             - Path=/timesheet/**
 
+        - id: auth-server
+          uri: lb://auth-server
+          predicates:
+            - Path=/auth/**
+
 # lb: specify load-balanced URLs
 # predicates: used to determine which routes should be executed based on certain conditions.
 # In this case, the condition is Path matching
