@@ -2,6 +2,7 @@ package com.example.authserver.Controller;
 
 import com.example.authserver.Domain.User;
 import com.example.authserver.Feign.ProfileClient;
+import com.example.authserver.Feign.TimesheetClient;
 import com.example.authserver.Requests.LoginRequest;
 import com.example.authserver.Security.JwtTokenProvider;
 import com.example.authserver.Service.UserService;
@@ -19,6 +20,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.sql.Time;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +34,7 @@ public class AuthController {
     private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
     private final ProfileClient profileClient;
+    private final TimesheetClient timesheetClient;
 
     private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
 
@@ -40,12 +43,14 @@ public class AuthController {
                           AuthenticationManager authenticationManager,
                           JwtTokenProvider jwtTokenProvider,
                           PasswordEncoder passwordEncoder,
-                          ProfileClient profileClient) {
+                          ProfileClient profileClient,
+                          TimesheetClient timesheetClient) {
         this.userService = userService;
         this.authenticationManager = authenticationManager;
         this.jwtTokenProvider = jwtTokenProvider;
         this.passwordEncoder = passwordEncoder;
         this.profileClient = profileClient;
+        this.timesheetClient = timesheetClient;
     }
 
     @PostMapping("/signup")
@@ -71,6 +76,7 @@ public class AuthController {
             userProfileRequest.setUsername(username);
             userProfileRequest.setEmail(email);
             String profile_id = profileClient.createProfileFromAuth(userProfileRequest).getBody();
+            timesheetClient.generateTimesheetCurweek(profile_id);
 
             // create a new user
             User user = new User(username, encryptedPassword, profile_id, role);
