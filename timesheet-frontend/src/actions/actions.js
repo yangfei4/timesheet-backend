@@ -57,3 +57,14 @@ export const updateTimesheet_action = (userId, weeklyTimesheet) => async (dispat
         console.log(error.message);
     }
 };
+
+export const setLogin_action = (isLoggedIn) => async (dispatch) => {
+    try {
+        dispatch({
+            type: actionTypes.SET_LOGIN,
+            payload: isLoggedIn
+        });
+    } catch (error) {
+        console.log(error.message);
+    }
+};
