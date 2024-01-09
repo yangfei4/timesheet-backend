@@ -2,6 +2,7 @@ package com.example.profileserver.Controller;
 
 
 import com.example.profileserver.DAO.ProfileRepository;
+import com.example.profileserver.Domain.EmergencyContact;
 import com.example.profileserver.Service.AmazonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,6 +16,7 @@ import com.example.profileserver.Service.ProfileService;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.print.attribute.standard.Media;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -81,6 +83,10 @@ public class ProfileController {
             profile.setName(username);
             Contact contact = new Contact();
             contact.setEmail(email);
+            List<EmergencyContact> emergencyContacts = new ArrayList<>();
+            emergencyContacts.add(new EmergencyContact("", "", ""));
+            emergencyContacts.add(new EmergencyContact("", "", ""));
+            contact.setEmergencyContacts(emergencyContacts);
             profile.setContact(contact);
             Profile data = profileService.createProfile(profile);
             return ResponseEntity.status(HttpStatus.CREATED).body(data.getId());
