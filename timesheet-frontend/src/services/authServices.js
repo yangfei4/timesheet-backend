@@ -29,3 +29,12 @@ export const signup_api = async (username, email, password) => {
         console.error('Error signing up:', error);
     }
 };
+
+export const logout_api = async () => {
+    try {
+        const response = await gateWayApi.post('/logout');
+        return response.data;
+    } catch (error) {
+        console.error('Error logging out:', error);
+    }
+};

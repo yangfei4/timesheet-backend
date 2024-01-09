@@ -2,8 +2,8 @@ import actionTypes from '../actions/actionTypes';
 
 const initialState = {
     user_profile: {
-        name: 'Yangfei',
-        id: '6562a44315353d2dfd584126'
+        name: '',
+        id: ''
     },
     summary_list: [],
     selected_timesheet: null,

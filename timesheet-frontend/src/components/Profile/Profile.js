@@ -5,9 +5,12 @@ import { Grid, FormControl, InputLabel, OutlinedInput, Button, TextField } from 
 
 import './Profile.scss';
 import { getProfile_api, uploadProfileAvatar_api, updateProfile_api } from '../../services/apiServices';
+import { logout_api } from '../../services/authServices';
+import { setLogin_action } from '../../actions/actions';
 
 const Profile = () => {
     const navigate = useNavigate();
+    const dispatch = useDispatch();
     const profile_store = useSelector(state => state.user_profile);
     const isLoggedIn_store = useSelector(state => state.isLoggedIn);
     const [profile, setProfile] = useState(profile_store);
@@ -75,6 +78,14 @@ const Profile = () => {
 
     const updateProfile = () => {
         updateProfile_api(profile);
+    }
+
+    const handleLogout = () => {
+        localStorage.removeItem('userId');
+        localStorage.removeItem('JWT');
+        dispatch(setLogin_action(false));
+
+        navigate('/welcome');
     }
 
     return (
@@ -158,6 +169,11 @@ const Profile = () => {
                             <div className='row'>
                                 <Button variant="contained" color="primary" onClick={updateProfile} >
                                 Save
+                                </Button>    
+                            </div>
+                            <div className='row'>
+                                <Button variant="contained" color="error" onClick={handleLogout} >
+                                Log Out
                                 </Button>
                             </div>
                         </div>
