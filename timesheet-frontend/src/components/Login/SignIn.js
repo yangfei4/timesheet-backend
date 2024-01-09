@@ -43,8 +43,8 @@ export default function SignIn() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const [username, setUsername] = useState("demo");
+  const [password, setPassword] = useState("demo123");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [message, setMessage] = useState("");
 
@@ -61,6 +61,7 @@ export default function SignIn() {
 
             // if successful, set localStorage
             localStorage.setItem('JWT', jwt);
+            
             localStorage.setItem('userId', userId);
             dispatch(setLogin_action(true));
             dispatch(getProfile_action(userId));
@@ -108,6 +109,7 @@ export default function SignIn() {
             Sign in
           </Typography>
           <Box component="form" noValidate sx={{ mt: 1 }}>
+          <Grid container spacing={2}>
             <TextField
               margin="normal"
               required
@@ -144,6 +146,7 @@ export default function SignIn() {
             >
               Sign In
             </Button>
+            </Grid>
             <Grid container justifyContent="flex-end">
               {/* <Grid item xs>
                 <Link href="#" variant="body2">

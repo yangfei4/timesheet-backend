@@ -12,8 +12,9 @@ import WelcomePage from './components/Pages/WelcomePage';
 import NotFoundPage from './components/Pages/NotFoundPage';
 import Login from './components/Login';
 import SignUp from './components/Signup';
+import { ifJwtExpired } from './utils/jwtParser';
 
-import { getProfile_action, getSummaryList_action } from './actions/actions';
+import { getProfile_action, getSummaryList_action, setLogin_action } from './actions/actions';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -23,8 +24,15 @@ function App() {
 
   useEffect(() => {
     if(isLoggedIn_store) {
-      dispatch(getProfile_action(localStorage.getItem('userId')));
-      dispatch(getSummaryList_action(localStorage.getItem('userId')));
+      if(!localStorage.getItem('JWT') || ifJwtExpired(localStorage.getItem('JWT'))) {
+        dispatch(setLogin_action(false));
+        localStorage.removeItem('JWT');
+        localStorage.removeItem('userId');
+      }
+      else{
+        dispatch(getProfile_action(localStorage.getItem('userId')));
+        dispatch(getSummaryList_action(localStorage.getItem('userId')));
+      }
     }
   }, [isLoggedIn_store]);
 

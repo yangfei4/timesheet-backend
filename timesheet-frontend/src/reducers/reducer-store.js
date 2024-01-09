@@ -1,4 +1,5 @@
 import actionTypes from '../actions/actionTypes';
+import { ifJwtExpired } from '../utils/jwtParser';
 
 const initialState = {
     user_profile: {
@@ -7,7 +8,7 @@ const initialState = {
     },
     summary_list: [],
     selected_timesheet: null,
-    isLoggedIn: localStorage.getItem('JWT') && localStorage.getItem('userId')
+    isLoggedIn: localStorage.getItem('JWT') && !ifJwtExpired(localStorage.getItem('JWT')) && localStorage.getItem('userId')
 }
 
 export default function appReducer(state = initialState, action) {

@@ -84,6 +84,7 @@ const Profile = () => {
         localStorage.removeItem('userId');
         localStorage.removeItem('JWT');
         dispatch(setLogin_action(false));
+        logout_api();
 
         navigate('/welcome');
     }
