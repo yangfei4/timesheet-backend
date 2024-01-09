@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router";
 import { useDispatch } from "react-redux";
-import { InputLabel, OutlinedInput, FormControl, TextField, Button, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from "@mui/material";
+import { TextField, Button, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from "@mui/material";
 
 import "./Login.scss";
 import { login_api } from "../../services/authServices";
@@ -76,7 +76,6 @@ const Login = () => {
                     value={password}
                     label="Password"
                 />
-
                 <div className="Button">
                     <Button
                         variant="contained"

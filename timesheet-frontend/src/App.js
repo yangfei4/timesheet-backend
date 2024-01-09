@@ -10,13 +10,12 @@ import Timesheet from './components/Timesheet';
 import Profile from './components/Profile';
 import WelcomePage from './components/Pages/WelcomePage';
 import NotFoundPage from './components/Pages/NotFoundPage';
-import Login from './components/Login/Login';
+import Login from './components/Login';
+import SignUp from './components/Signup';
 
-import { getProfile_action, getSummaryList_action, setSelectedTimesheet_action } from './actions/actions';
+import { getProfile_action, getSummaryList_action } from './actions/actions';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { Flag } from '@mui/icons-material';
-import { is } from 'date-fns/locale';
 
 function App() {
   const dispatch = useDispatch();
@@ -24,7 +23,6 @@ function App() {
 
   useEffect(() => {
     if(isLoggedIn_store) {
-      console.log("logged user id", localStorage.getItem('userId'));
       dispatch(getProfile_action(localStorage.getItem('userId')));
       dispatch(getSummaryList_action(localStorage.getItem('userId')));
     }
@@ -45,6 +43,7 @@ function App() {
             <Route path="/welcome" element={<WelcomePage/>} />            
             <Route path="*" element={<NotFoundPage/>} />
             <Route path="/login" element={<Login/>} />
+            <Route path="/signup" element={<SignUp/>} />
           </Routes>
         </main>
       </div>

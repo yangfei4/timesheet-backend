@@ -21,6 +21,7 @@ import { login_api } from "../../services/authServices";
 import { getJwtPayload } from "../../utils/jwtParser";
 import { setLogin_action, getProfile_action, getSummaryList_action } from "../../actions/actions";
 
+import "./SignIn.scss";
 
 function Copyright(props) {
   return (
@@ -62,8 +63,8 @@ export default function SignIn() {
             localStorage.setItem('JWT', jwt);
             localStorage.setItem('userId', userId);
             dispatch(setLogin_action(true));
-            dispatch(getProfile_action(localStorage.getItem('userId')));
-            dispatch(getSummaryList_action(localStorage.getItem('userId')));
+            dispatch(getProfile_action(userId));
+            dispatch(getSummaryList_action(userId));
 
             setMessage("Login Successful");
             setDialogOpen(true);
@@ -143,14 +144,14 @@ export default function SignIn() {
             >
               Sign In
             </Button>
-            <Grid container>
-              <Grid item xs>
+            <Grid container justifyContent="flex-end">
+              {/* <Grid item xs>
                 <Link href="#" variant="body2">
                   Forgot password?
                 </Link>
-              </Grid>
-              <Grid item>
-                <Link href="#" variant="body2">
+              </Grid> */}
+              <Grid item> 
+                <Link href="/signup" variant="body2">
                   {"Don't have an account? Sign Up"}
                 </Link>
               </Grid>
