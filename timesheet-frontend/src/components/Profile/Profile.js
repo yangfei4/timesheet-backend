@@ -53,6 +53,26 @@ const Profile = () => {
         });
     }
 
+    const handleEmergencyContactChange = (prop, index) => (event) => {
+        const newEmergencyContacts = profile.contact.emergencyContacts.map((row, i) => {
+            if(i === index) {
+                return {
+                    ...row,
+                    [prop]: event.target.value
+                }
+            } else {
+                return row;
+            }
+        });
+        setProfile({
+            ...profile,
+            contact: {
+                ...profile.contact,
+                emergencyContacts: newEmergencyContacts
+            }
+        });
+    }
+
     const updateProfile = () => {
         updateProfile_api(profile);
     }
@@ -89,34 +109,29 @@ const Profile = () => {
                         <div className='row'>
                             <h3>Contact</h3>
                             <hr></hr>
-
                             <div className='row'>
                                 <FormControl variant="outlined">
                                     <InputLabel htmlFor="component-outlined">Phone</InputLabel>
-                                    <OutlinedInput id="component-outlined" value={profile?.contact?.phone} onChange={handleContactChange('phone')} label="Name" />
+                                    <OutlinedInput id="component-outlined" value={profile?.contact?.phone} onChange={handleContactChange('phone')} label="name" />
                                 </FormControl>
                             </div>
                             <div className='row'>
                                 <FormControl variant="outlined">
                                     <InputLabel htmlFor="component-outlined">Email</InputLabel>
-                                    <OutlinedInput id="component-outlined" value={profile?.contact?.email} onChange={handleContactChange('email')} label="Name" />
+                                    <OutlinedInput id="component-outlined" value={profile?.contact?.email} onChange={handleContactChange('email')} label="email" />
                                 </FormControl>
                             </div>
                             <div className='row'>
                                 <TextField
                                     id="outlined-multiline-static"
-                                    label="Multiline"
+                                    label="Address"
                                     multiline
                                     rows={4}
-                                    defaultValue={profile?.contact?.address}
+                                    defaultValue=" "
+                                    value={profile?.contact?.address}
                                     onChange={handleContactChange('address')}
                                     variant="outlined"
                                 />
-                            </div>
-                            <div className='row'>
-                                <Button variant="contained" color="primary" onClick={updateProfile} >
-                                Save
-                                </Button>
                             </div>
                             {profile?.contact?.emergencyContacts?.map((row, index) => (
                                 <div key={index}>
@@ -127,19 +142,24 @@ const Profile = () => {
                                     </div>
                                     <hr></hr>
                                     <div className='row'>
-                                        <FormControl variant="outlined" disabled>
+                                        <FormControl variant="outlined">
                                             <InputLabel htmlFor="component-outlined">Name</InputLabel>
-                                            <OutlinedInput id="component-outlined" value={row.firstName + " " + row.lastName} label="Name" />
+                                            <OutlinedInput id="component-outlined" value={row.firstName} label="Name" onChange={handleEmergencyContactChange('firstName', index)}/>
                                             </FormControl>
                                     </div>
                                     <div className='row'>
-                                        <FormControl variant="outlined" disabled>
+                                        <FormControl variant="outlined">
                                             <InputLabel htmlFor="component-outlined">Phone</InputLabel>
-                                            <OutlinedInput id="component-outlined" value={row.phone} label="Name" />
+                                            <OutlinedInput id="component-outlined" value={row.phone} label="Name" onChange={handleEmergencyContactChange('phone', index)}/>
                                         </FormControl>
                                     </div>
                                 </div>
                             ))}
+                            <div className='row'>
+                                <Button variant="contained" color="primary" onClick={updateProfile} >
+                                Save
+                                </Button>
+                            </div>
                         </div>
                     </form>
                 </div>
