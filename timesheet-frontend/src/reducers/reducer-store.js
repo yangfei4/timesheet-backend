@@ -6,7 +6,9 @@ const initialState = {
         id: '6562a44315353d2dfd584126'
     },
     summary_list: [],
-    selected_timesheet: null
+    selected_timesheet: null,
+    isLoggedIn: false
+    // isLoggedIn: localStorage.getItem('JWT') && localStorage.getItem('userId')
 }
 
 export default function appReducer(state = initialState, action) {

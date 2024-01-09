@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import { Grid, FormControl, InputLabel, Select, MenuItem, styled, TextField, Alert, 
     Button, Tooltip, TableContainer, Table, TableHead, TableBody, TableRow, TableCell, Checkbox } from '@mui/material';
-import { format, parseISO, set } from 'date-fns';
+import { format, parseISO } from 'date-fns';
 import InfoIcon from '@mui/icons-material/Info';
 
 import { setSelectedTimesheet_action, updateTimesheet_action, getProfile_action } from '../../actions/actions';
@@ -10,11 +11,14 @@ import { getProfile_api, updateTemplate_api, uploadDocument_api } from '../../se
 
 const Timesheet = () => {
     const dispatch = useDispatch();
+    const navigate = useNavigate();
 
     const selected_timesheet = useSelector(state => state.selected_timesheet);
     const summaryList = useSelector(state => state.summary_list);
     const user_profile = useSelector(state => state.user_profile);
+    const isLoggedIn_store = useSelector(state => state.isLoggedIn);
 
+    const [showPrompt, setShowPrompt] = useState(true);
     const [profile, setProfile] = useState(user_profile);
     const [newTimesheet, setNewTimesheet] = useState(selected_timesheet);
     const [isValid, setValid] = useState(true);
@@ -29,18 +33,23 @@ const Timesheet = () => {
 
     // set default selected timesheet
     useEffect(() => {
+        if(!isLoggedIn_store) {
+            navigate('/welcome');
+        }
         if(!selected_timesheet && summaryList.length>0) {
             const latestTimesheet = summaryList[0];
             dispatch(setSelectedTimesheet_action(latestTimesheet));
             setNewTimesheet(latestTimesheet);
         }
-        getProfile_api(user_profile.id).
+        if(user_profile?.id) {
+            getProfile_api(user_profile.id).
             then(response => {
                 setProfile(response.data);
                 setFloatingDayRemain(response.data.remainingFloatingDay);
                 setVacationDayRemain(response.data.remainingVacationDay);
             }
         );
+        }
     }, [dispatch, summaryList, selected_timesheet]);
 
     // Update selected timesheet, including its billing, compensated hours, starting time, ending time
@@ -167,6 +176,8 @@ const Timesheet = () => {
     }
 
     const handleStartingTimeChange = (index, e) => {
+        setShowPrompt(true);
+        console.log("the showPrompt is: ", showPrompt);
         let dailyTimesheets = [...newTimesheet.weeklyTimesheet.dailyTimesheets];
         let changedDailyTimesheet = {...dailyTimesheets[index]};
 
@@ -285,6 +296,7 @@ const Timesheet = () => {
         let document = {...weeklyTimesheet.document}
         if(docType && selectedDocument) {
             document.type = docType;
+
         }
 
         const latestNewTimesheet = {
@@ -312,6 +324,10 @@ const Timesheet = () => {
         (newTimesheet && summaryList.length>0)
         ?
         (<div>
+            {/* <RouterPrompt
+                when={showPrompt}
+                message="You have unsaved changes, are you sure you want to leave?"
+            /> */}
             <Grid
                 container
                 spacing={2}

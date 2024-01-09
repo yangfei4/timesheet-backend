@@ -1,5 +1,6 @@
 import React, { useEffect, useId, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
@@ -10,13 +11,15 @@ import { setSelectedTimesheet_action } from '../../actions/actions';
 import { getProfile_api } from '../../services/apiServices';
 import paginate from '../../utils/paginate';
 import Pagination from './Pagination';
-// import actionTypes from '../../actions/actionTypes';
+import context from 'react-bootstrap/esm/AccordionContext';
 
 const Summary = () => {
 
     const dispatch = useDispatch();
-    const userId = localStorage.getItem('userId');
+    const navigate = useNavigate();
 
+    const userId = localStorage.getItem('userId');
+    const isLoggedIn_store = useSelector(state => state.isLoggedIn);
     const summaryList = useSelector(state => state.summary_list);
     const profile_store = useSelector(state => state.user_profile);
 
@@ -26,6 +29,9 @@ const Summary = () => {
 
     // make sure the profile is the latest
     useEffect(() => {
+        if(!isLoggedIn_store) {
+            navigate('/welcome');
+        }
         if(userId) {
             getProfile_api(userId)
             .then(response => {

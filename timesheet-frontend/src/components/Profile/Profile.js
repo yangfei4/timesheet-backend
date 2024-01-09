@@ -1,17 +1,22 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import { Grid, FormControl, InputLabel, OutlinedInput, Button, TextField } from '@mui/material';
 
 import './Profile.scss';
-// import {  } from '../../actions/actions';
 import { getProfile_api, uploadProfileAvatar_api, updateProfile_api } from '../../services/apiServices';
 
 const Profile = () => {
+    const navigate = useNavigate();
     const profile_store = useSelector(state => state.user_profile);
+    const isLoggedIn_store = useSelector(state => state.isLoggedIn);
     const [profile, setProfile] = useState(profile_store);
     const [document, setDocument] = useState(null);
 
     useEffect(() => {
+        if(!isLoggedIn_store) {
+            navigate('/welcome');
+        }
         // make sure to get the latest profile from the database
         if(profile_store?.id) {
             getProfile_api(profile_store.id)
