@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useId, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
 import IconButton from '@mui/material/IconButton';
@@ -26,12 +26,13 @@ const Summary = () => {
 
     // make sure the profile is the latest
     useEffect(() => {
-        getProfile_api(userId)
+        if(userId) {
+            getProfile_api(userId)
             .then(response => {
                 setProfile(response.data);
             });
+        }
     }, []);
-
 
     const handlePageChange = (page) => {
         setCurrentPage(page);

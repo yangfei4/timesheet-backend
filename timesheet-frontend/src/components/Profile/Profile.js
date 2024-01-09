@@ -13,10 +13,12 @@ const Profile = () => {
 
     useEffect(() => {
         // make sure to get the latest profile from the database
-        getProfile_api(profile_store.id)
+        if(profile_store?.id) {
+            getProfile_api(profile_store.id)
             .then(response => {
                 setProfile(response.data);
             });
+        }
     }, []);
 
     const handleFileInput = (e) => {
