@@ -50,6 +50,11 @@ export default function appReducer(state = initialState, action) {
                     }
                 })
             };
+        case actionTypes.SET_LOGIN:
+            return {
+                ...state,
+                isLoggedIn: action.payload
+            };
         default:
             return state;
     }
