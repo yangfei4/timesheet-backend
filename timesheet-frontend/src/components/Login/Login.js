@@ -1,12 +1,10 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router";
 import { useDispatch } from "react-redux";
-import { TextField, Button, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from "@mui/material";
+import { InputLabel, OutlinedInput, FormControl, TextField, Button, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from "@mui/material";
 
 import "./Login.scss";
 import { login_api } from "../../services/authServices";
-import { da } from "date-fns/locale";
-import Profile from "../Profile";
 import { getJwtPayload } from "../../utils/jwtParser";
 import { setLogin_action, getProfile_action, getSummaryList_action } from "../../actions/actions";
 
@@ -66,6 +64,7 @@ const Login = () => {
                     required
                     onChange={(e) => setUsername(e.target.value)}
                     value={username}
+                    label="Username"
                 />
                 <TextField
                     variant="standard"
@@ -75,6 +74,7 @@ const Login = () => {
                     type="password"
                     onChange={(e) => setPassword(e.target.value)}
                     value={password}
+                    label="Password"
                 />
 
                 <div className="Button">
