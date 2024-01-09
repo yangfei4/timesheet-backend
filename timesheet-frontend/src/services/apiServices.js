@@ -1,35 +1,58 @@
 import axios from 'axios';
 
+const jwt = localStorage.getItem('JWT');
+const gateWayApi = axios.create({
+    baseURL: 'http://localhost:9000',
+    headers: {
+        'Authorization': `Bearer ${jwt}`,
+    }
+});
+
+
 export const getProfile_api = async (userId) => {
-    return axios.get(`http://localhost:9000/profile/${userId}`)
-        .then(res => res.data)
-        .catch(err => console.log(err));
+    try {
+        const response = await gateWayApi.get(`/profile/${userId}`);
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching profile:', error);
+    }
 };
 
 export const getSummaryList_api = async (userId) => {
-    return axios.get(`http://localhost:9000/timesheet/summary/${userId}`)
-        .then(res => res.data)
-        .catch(err => console.log(err));
+    
+    try {
+        const response = await gateWayApi.get(`/timesheet/summary/${userId}`);
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching summary list:', error);
+    }
 };
 
 export const updateTimesheet_api = async (userId, weeklyTimesheet) => {
-    return axios.patch(`http://localhost:9000/timesheet/${userId}`, weeklyTimesheet)
-        .then(res => res.data)
-        .catch(err => console.log(err));
+
+    try {
+        const response = await gateWayApi.patch(`/timesheet/${userId}`, weeklyTimesheet);
+        return response.data;
+    } catch (error) {
+        console.error('Error updating timesheet:', error);
+    }
 };
 
 export const updateTemplate_api = async (userId, template) => {
-    return axios.patch(`http://localhost:9000/timesheet/template/${userId}`, template)
-        .then(res => res.data)
-        .catch(err => console.log(err));
+    try {
+        const response = await gateWayApi.patch(`/timesheet/template/${userId}`, template);
+        return response.data;
+    } catch (error) {
+        console.error('Error updating template:', error);
+    }
 };
 
 export const uploadDocument_api = async (userId, weekEnding, document) => {
     try {
         const formData = new FormData();
         formData.append('document', document);
-        const response = await axios.patch(
-            'http://localhost:9000/timesheet/uploadDocument',
+        const response = await gateWayApi.patch(
+            '/timesheet/uploadDocument',
             formData,
             {
                 params: {
@@ -45,7 +68,6 @@ export const uploadDocument_api = async (userId, weekEnding, document) => {
         return response.data;
     } catch (error) {
         console.error('Error uploading document:', error);
-        throw error;
     }
 };
 
@@ -53,8 +75,8 @@ export const uploadProfileAvatar_api = async (userId, document) => {
     try {
         const formData = new FormData();
         formData.append('document', document);
-        const response = await axios.post(
-            `http://localhost:9000/profile/uploadAvatar`,
+        const response = await gateWayApi.post(
+            `/profile/uploadAvatar`,
             formData,
             {
                 params: {
@@ -69,12 +91,14 @@ export const uploadProfileAvatar_api = async (userId, document) => {
         return response.data;
     } catch (error) {
         console.error('Error uploading avatar:', error);
-        throw error;
     }
 }
 
 export const updateProfile_api = async (profile) => {
-    return axios.patch(`http://localhost:9000/profile/${profile.id}`, profile)
-        .then(res => res.data)
-        .catch(err => console.log(err));
+    try {
+        const response = await gateWayApi.patch(`/profile/${profile.id}`, profile);
+        return response.data;
+    } catch (error) {
+        console.error('Error updating profile:', error);
+    }
 };
