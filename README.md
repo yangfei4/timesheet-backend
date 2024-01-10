@@ -13,6 +13,6 @@ A project for Timesheet Management System, effectively using Spring Boot with mi
 
 ## 🛠 Skills, Libraries, and Tools Used
 - Java 8, Microservices, Maven, Spring Boot, Spring Security
-- Netflix Eureka, Restful Web-Service
+- Netflix Eureka, Netflix Feign, Restful Web-Service
 - React, Reducer, Redux
 - MongoDB, AWS S3, Amazon RDS, Git
